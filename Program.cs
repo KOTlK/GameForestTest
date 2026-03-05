@@ -18,17 +18,26 @@ internal static class Program {
         var game          = new Game();
 
         var emUpdateSystem = new EntitiesUpdateSystem(game, entityManager);
-        var gridSystem = new GridSystem(game, entityManager, new Vector2UInt(8, 8));
+        var gridSystem = new GridSystem(game, 
+                                        entityManager, 
+                                        new Vector2UInt(8, 8),
+                                        new Vector2(30f, 30f));
+        var animationSystem = new GridAnimationSystem(game, entityManager);
         var random = new Random();
 
         game.AppendSystem(emUpdateSystem);
         game.AppendSystem(gridSystem);
+        game.AppendSystem(animationSystem);
         game.AppendSystem(new RenderSystem(game, entityManager, camera));
 
         Services<Game>.Create(game);
         Services<EntityManager>.Create(entityManager);
 
         InitWindow(WindowWidth, WindowHeight, "Hello World");
+
+        camera.AlignWithGrid(gridSystem.Size, gridSystem.CellSize, new Vector2(10, 10));
+
+        gridSystem.FillRandom();
 
         while (!WindowShouldClose()) {
             Clock.Update(GetFrameTime());
@@ -38,8 +47,34 @@ internal static class Program {
 
             camera.SetZoom(camera.Zoom + wheel * wheelSens * Clock.Delta);
 
+            if (IsMouseButtonPressed(MouseButton.Left)) {
+                var pointerPos = camera.GetPointerWorldPos();
+
+                if (gridSystem.IsPointOutsideGridBounds(pointerPos)) {
+                    gridSystem.ResetSelection();
+                } else {
+                    var gridPos = gridSystem.WorldPointToGridPos(pointerPos);
+
+                    if (gridSystem.CellSelected) {
+                        if (gridSystem.CanSwitchWithSelected(gridPos)) {
+                            Console.WriteLine("Switching");
+                            gridSystem.SwitchPositions((uint)gridSystem.SelectedCell,
+                                                       gridSystem.GetCellIndex(gridPos));
+                        } else {
+                            gridSystem.ResetSelection();
+                        }
+                    } else {
+                        gridSystem.SelectCell(gridPos);
+                    }
+                }
+            }
+
+            var dir = Vector2.Zero;
+
             if (IsKeyPressed(KeyboardKey.Space)) {
-                var (_, element) = entityManager.CreateEntity<Element>("green_circle_element", Vector2.Zero, 0);
+                var (_, element) = entityManager.CreateEntity<Element>("green_circle_element", 
+                                                                       Vector2.Zero, 
+                                                                       0);
 
                 var randX = (uint)random.NextInt64() % 8;
                 var randY = (uint)random.NextInt64() % 8;

@@ -32,6 +32,7 @@ public struct AssetEntry : IDeserializer {
 }
 
 public class AssetDatabase : ISerializer, IDeserializer {
+	// @Temp: Hardcoded entries. Parse from text
 	public List<AssetEntry> Entries = new() {
 		new AssetEntry() {
 			Name   = "green_circle_element",
@@ -54,7 +55,7 @@ public class AssetDatabase : ISerializer, IDeserializer {
 					Content = new Renderer {
 						Color  = Color.Green,
 						Shape  = ShapeType.Circle,
-						Radius = 1f
+						Radius = 10f
 					}
 				},
 				new AssetField() {
@@ -66,12 +67,202 @@ public class AssetDatabase : ISerializer, IDeserializer {
 					Content = ElementShape.Circle
 				},
 			}
-		}
+		},
+		new AssetEntry() {
+			Name   = "red_circle_element",
+			Type   = AssetType.Entity,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Type",
+					Content = EntityType.Element
+				},
+				new AssetField() {
+					Name    = "Flags",
+					Content = EntityFlags.Dynamic
+				},
+				new AssetField() {
+					Name    = "Scale",
+					Content = Vector2.One
+				},
+				new AssetField() {
+					Name    = "Renderer",
+					Content = new Renderer {
+						Color  = Color.Red,
+						Shape  = ShapeType.Circle,
+						Radius = 10f
+					}
+				},
+				new AssetField() {
+					Name    = "Color",
+					Content = ElementColor.Red
+				},
+				new AssetField() {
+					Name    = "Shape",
+					Content = ElementShape.Circle
+				},
+			}
+		},
+		new AssetEntry() {
+			Name   = "blue_circle_element",
+			Type   = AssetType.Entity,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Type",
+					Content = EntityType.Element
+				},
+				new AssetField() {
+					Name    = "Flags",
+					Content = EntityFlags.Dynamic
+				},
+				new AssetField() {
+					Name    = "Scale",
+					Content = Vector2.One
+				},
+				new AssetField() {
+					Name    = "Renderer",
+					Content = new Renderer {
+						Color  = Color.Blue,
+						Shape  = ShapeType.Circle,
+						Radius = 10f
+					}
+				},
+				new AssetField() {
+					Name    = "Color",
+					Content = ElementColor.Blue
+				},
+				new AssetField() {
+					Name    = "Shape",
+					Content = ElementShape.Circle
+				},
+			}
+		},
+		new AssetEntry() {
+			Name   = "green_rectangle_element",
+			Type   = AssetType.Entity,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Type",
+					Content = EntityType.Element
+				},
+				new AssetField() {
+					Name    = "Flags",
+					Content = EntityFlags.Dynamic
+				},
+				new AssetField() {
+					Name    = "Scale",
+					Content = Vector2.One
+				},
+				new AssetField() {
+					Name    = "Renderer",
+					Content = new Renderer {
+						Color  = Color.Green,
+						Shape  = ShapeType.Rectangle,
+						Size   = new Vector2(10, 10)
+					}
+				},
+				new AssetField() {
+					Name    = "Color",
+					Content = ElementColor.Green
+				},
+				new AssetField() {
+					Name    = "Shape",
+					Content = ElementShape.Rectangle
+				},
+			}
+		},
+		new AssetEntry() {
+			Name   = "red_rectangle_element",
+			Type   = AssetType.Entity,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Type",
+					Content = EntityType.Element
+				},
+				new AssetField() {
+					Name    = "Flags",
+					Content = EntityFlags.Dynamic
+				},
+				new AssetField() {
+					Name    = "Scale",
+					Content = Vector2.One
+				},
+				new AssetField() {
+					Name    = "Renderer",
+					Content = new Renderer {
+						Color  = Color.Red,
+						Shape  = ShapeType.Rectangle,
+						Size   = new Vector2(10, 10)
+					}
+				},
+				new AssetField() {
+					Name    = "Color",
+					Content = ElementColor.Red
+				},
+				new AssetField() {
+					Name    = "Shape",
+					Content = ElementShape.Rectangle
+				},
+			}
+		},
+		new AssetEntry() {
+			Name   = "blue_rectangle_element",
+			Type   = AssetType.Entity,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Type",
+					Content = EntityType.Element
+				},
+				new AssetField() {
+					Name    = "Flags",
+					Content = EntityFlags.Dynamic
+				},
+				new AssetField() {
+					Name    = "Scale",
+					Content = Vector2.One
+				},
+				new AssetField() {
+					Name    = "Renderer",
+					Content = new Renderer {
+						Color  = Color.Blue,
+						Shape  = ShapeType.Rectangle,
+						Size   = new Vector2(10, 10)
+					}
+				},
+				new AssetField() {
+					Name    = "Color",
+					Content = ElementColor.Blue
+				},
+				new AssetField() {
+					Name    = "Shape",
+					Content = ElementShape.Rectangle
+				},
+			}
+		},
 	};
 	public Dictionary<string, int> EntryByName = new() {
 		{
 			"green_circle_element",
 			0
+		},
+		{
+			"red_circle_element",
+			1
+		},
+		{
+			"blue_circle_element",
+			2
+		},
+		{
+			"green_rectangle_element",
+			3
+		},
+		{
+			"red_rectangle_element",
+			4
+		},
+		{
+			"blue_rectangle_element",
+			5
 		}
 
 	};
