@@ -91,6 +91,8 @@ public class EntityManager {
         obj.Position    = position;
         obj.Orientation = orientation;
         obj.Scale       = Vector2.One;
+        obj.Em          = this;
+        obj.Handle      = handle;
 
         AssetManager.LoadEntity(prefab, obj);
 
@@ -104,8 +106,6 @@ public class EntityManager {
         Tags[id]     = tag;
         Flags[id]    = obj.Flags;
 
-        obj.Handle      = handle;
-        obj.Em          = this;
 
         EntitiesByType[obj.Type].Add(handle.Id);
 
@@ -134,6 +134,9 @@ public class EntityManager {
             var entity = Entities[handle.Id];
 
             Assert(entity != null, "Cannot destroy null entity (%)", id);
+
+            var renderSystem = Services<RenderSystem>.Get();
+            renderSystem.RemoveRenderer(entity.Renderer);
 
             EntitiesByType[entity.Type].Remove(handle.Id);
             Entities[id] = null;

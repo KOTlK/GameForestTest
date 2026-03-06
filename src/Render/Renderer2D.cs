@@ -8,10 +8,11 @@ public enum ShapeType {
 }
 
 public struct Renderer {
-	public Color     Color;
-	public ShapeType Shape;
-	public float     Radius;
-	public Vector2   Size;
+	public EntityHandle Entity;
+	public Color     	Color;
+	public ShapeType 	Shape;
+	public float     	Radius;
+	public Vector2   	Size;
 
 	public void Deserializer(IDeserializer reader) {
 		reader.Read<Color>(nameof(Color));

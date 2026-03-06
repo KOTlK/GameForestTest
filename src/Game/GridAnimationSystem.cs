@@ -12,6 +12,8 @@ public class GridAnimationSystem : GameSystem {
 	// @Speed: Switch to something sane. Now it's O(n) when removing transactions.
 	public List<Transaction> Transactions = new();
 
+	public bool AllTransactionsOver => Transactions.Count == 0;
+
 	// @Cleanup: Return handle to transaction to be able to stop it later.
 	public void AppendTransaction(Transaction t) {
 		t.Em = em;

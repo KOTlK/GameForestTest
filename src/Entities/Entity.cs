@@ -33,8 +33,9 @@ public class Entity {
         Flags = reader.Read<EntityFlags>(nameof(Flags));
         Scale = reader.Read<Vector2>(nameof(Scale));
         var renderer = reader.Read<Renderer>(nameof(Renderer));
+        renderer.Entity = Handle;
 
-        var renderSystem = Services<Game>.Get().GetSystem<RenderSystem>();
+        var renderSystem = Services<RenderSystem>.Get();
 
         Renderer = renderSystem.AppendRenderer(renderer);
 

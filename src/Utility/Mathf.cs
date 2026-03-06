@@ -13,4 +13,11 @@ public static class Mathf {
 
 		return a + dir * maxDelta;
 	}
+
+	public static Vector2 PingPong(Vector2 start, Vector2 end, float t) {
+        t = Math.Max(0f, Math.Min(1f, t));
+        float pingPong = MathF.Abs(t * 2f - 1f);
+
+        return Vector2.Lerp(start, end, pingPong);
+    }
 }

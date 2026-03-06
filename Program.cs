@@ -8,6 +8,9 @@ internal static class Program {
     private const int WindowWidth = 1600;
     private const int WindowHeight = 900;
 
+    private static Vector2UInt gridSize = new Vector2UInt(8, 8);
+    private static Vector2     cellSize = new Vector2(30, 30);
+
     [System.STAThread]
     public static void Main() {
         var camera = new Camera(new Vector2(WindowWidth / 2f, WindowHeight / 2f),
@@ -20,18 +23,21 @@ internal static class Program {
         var emUpdateSystem = new EntitiesUpdateSystem(game, entityManager);
         var gridSystem = new GridSystem(game, 
                                         entityManager, 
-                                        new Vector2UInt(8, 8),
-                                        new Vector2(30f, 30f));
+                                        gridSize,
+                                        cellSize);
         var animationSystem = new GridAnimationSystem(game, entityManager);
         var random = new Random();
 
         game.AppendSystem(emUpdateSystem);
         game.AppendSystem(gridSystem);
         game.AppendSystem(animationSystem);
-        game.AppendSystem(new RenderSystem(game, entityManager, camera));
+        var render = new RenderSystem(game, entityManager, camera);
+        game.AppendSystem(render);
 
         Services<Game>.Create(game);
         Services<EntityManager>.Create(entityManager);
+        Services<GridSystem>.Create(gridSystem);
+        Services<RenderSystem>.Create(render);
 
         InitWindow(WindowWidth, WindowHeight, "Hello World");
 
@@ -57,9 +63,8 @@ internal static class Program {
 
                     if (gridSystem.CellSelected) {
                         if (gridSystem.CanSwitchWithSelected(gridPos)) {
-                            Console.WriteLine("Switching");
-                            gridSystem.SwitchPositions((uint)gridSystem.SelectedCell,
-                                                       gridSystem.GetCellIndex(gridPos));
+                            gridSystem.TrySwitchPositions((uint)gridSystem.SelectedCell,
+                                                           gridSystem.GetCellIndex(gridPos));
                         } else {
                             gridSystem.ResetSelection();
                         }
@@ -72,14 +77,12 @@ internal static class Program {
             var dir = Vector2.Zero;
 
             if (IsKeyPressed(KeyboardKey.Space)) {
-                var (_, element) = entityManager.CreateEntity<Element>("green_circle_element", 
-                                                                       Vector2.Zero, 
-                                                                       0);
+                gridSystem.Fall();
+            }
 
-                var randX = (uint)random.NextInt64() % 8;
-                var randY = (uint)random.NextInt64() % 8;
-
-                gridSystem.PutElement(new Vector2UInt(randX, randY), element);
+            if (IsKeyPressed(KeyboardKey.N)) {
+                gridSystem.MakeNewGrid(gridSize, cellSize);
+                gridSystem.FillRandom();
             }
 
             game.Update();

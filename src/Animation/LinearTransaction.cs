@@ -3,39 +3,43 @@ using System.Numerics;
 
 public class LinearTransaction : Transaction {
 	public EntityHandle 		Entity;
+	public Vector2              From;
 	public Vector2      		To;
-	public float                Speed;
+	public float                Duration;
 	public event Action<Entity> OnTransactionOver = delegate {};
 
+	private float timePassed = 0f;
 	private const float epsilon = 0.01f;
 
 	public LinearTransaction(EntityHandle   entity, 
+							 Vector2        from,
 							 Vector2        to,
-							 float          speed,
+							 float          duration,
 							 Action<Entity> onTransactionOver = null) {
-		Entity = entity;
-		To     = to;
-		Speed  = speed;
+		Entity   = entity;
+		From     = from;
+		To       = to;
+		Duration = duration;
 		OnTransactionOver += onTransactionOver;
-		IsOver = false;
+		IsOver   = false;
 	}
 
 	public override void Update() {
+		timePassed += Clock.Delta;
+
 		if (!Em.GetEntity(Entity, out var entity)) {
 			IsOver = true;
 			return;
 		}
 
-		var pos     = entity.Position;
-		var nextPos = Mathf.MoveTowards(pos, To, Speed * Clock.Delta);
-		var dir 	= To - nextPos;
-
-		if (dir.LengthSquared() <= epsilon) {
+		if (timePassed >= Duration) {
 			entity.Position = To;
-			IsOver 		    = true;
-			OnTransactionOver(entity);
-		} else {
-			entity.Position = nextPos;
+			IsOver = true;
+			return;
 		}
+
+		var t = timePassed / Duration;
+
+		entity.Position = Vector2.Lerp(From, To, t);
 	}
 }

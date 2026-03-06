@@ -8,6 +8,8 @@ using static Assertions;
 
 public struct RendererHandle {
 	public uint Id;
+
+	public static readonly RendererHandle Zero = new RendererHandle() {Id = 0};
 }
 
 public class RenderSystem : GameSystem {
@@ -45,6 +47,7 @@ public class RenderSystem : GameSystem {
 	}
 
 	public void RemoveRenderer(RendererHandle handle) {
+		if (handle.Id == 0) return;
 		RendererFree[handle.Id] = true;
 		NextFreeRenderer[handle.Id] = FirstFreeRenderer;
 		FirstFreeRenderer = handle.Id;
@@ -74,7 +77,7 @@ public class RenderSystem : GameSystem {
 			for (uint x = 0; x < gridSize.x; x++) {
 				var cellIndex = grid.GetCellIndex(x, y);
 				var color     = cellIndex == grid.SelectedCell ? Color.Green : 
-																 Color.Red;
+																 Color.Beige;
 				var pos = new Vector2(x * cellSize.X,
 									  y * cellSize.Y);
 				var rect = new Rectangle(pos, cellSize);
@@ -83,19 +86,13 @@ public class RenderSystem : GameSystem {
 			}
 		}
 
-		// Render entities
-		for (var i = 1; i < em.MaxEntitiesCount; i++) {
-			if (em.Free[i]) continue;
+		// Render entities.
+		for (var i = 1; i < RenderersCount; i++) {
+			if (RendererFree[i]) continue;
 
-			var entity = em.Entities[i];
+			var renderer = Renderers[i];
 
-			if (entity.Renderer.Id == 0) continue;
-
-			Assert(RendererFree[entity.Renderer.Id] == false, 
-				   "Trying to draw empty renderer. (%)", entity.Renderer.Id);
-
-			var renderer = Renderers[entity.Renderer.Id];
-
+			if (!em.GetEntity(renderer.Entity, out Entity entity)) continue;
 
 			switch (renderer.Shape) {
 				case ShapeType.Circle : {
@@ -114,6 +111,38 @@ public class RenderSystem : GameSystem {
 				} break;
 			}
 		}
+
+		// // Render entities
+		// for (var i = 1; i < em.MaxEntitiesCount; i++) {
+		// 	if (em.Free[i]) continue;
+
+		// 	var entity = em.Entities[i];
+
+		// 	if (entity.Renderer.Id == 0) continue;
+
+		// 	Assert(RendererFree[entity.Renderer.Id] == false, 
+		// 		   "Trying to draw empty renderer. (%)", entity.Renderer.Id);
+
+		// 	var renderer = Renderers[entity.Renderer.Id];
+
+
+		// 	switch (renderer.Shape) {
+		// 		case ShapeType.Circle : {
+		// 			DrawCircleV(entity.Position, 
+		// 						renderer.Radius * entity.Scale.X, 
+		// 						renderer.Color);
+		// 		} break;
+		// 		case ShapeType.Rectangle : {
+		// 			var center   = entity.Position;
+		// 			var halfSize = renderer.Size * entity.Scale * 0.5f;
+		// 			center      -= halfSize;
+
+		// 			DrawRectangleV(center,
+		// 						   renderer.Size * entity.Scale,
+		// 						   renderer.Color);
+		// 		} break;
+		// 	}
+		// }
 		EndMode2D();
 
         DrawText("Hello, world!", 0, 0, 20, Color.Black);
