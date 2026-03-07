@@ -4,6 +4,8 @@ public struct Vector2UInt {
 	public uint x;
 	public uint y;
 
+	public static readonly Vector2UInt zero = new Vector2UInt(0, 0);
+
 	public Vector2UInt(uint x, uint y) {
 		this.x = x;
 		this.y = y;

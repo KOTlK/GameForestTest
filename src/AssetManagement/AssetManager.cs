@@ -4,4 +4,8 @@ public static class AssetManager {
 	public static void LoadEntity(string name, Entity entity) {
 		database.ReadEntity(name, entity);
 	}
+
+	public static T LoadAsset<T>(string name) {
+		return database.Read<T>(name);
+	}
 }

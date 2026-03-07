@@ -25,6 +25,7 @@ public class RenderSystem : GameSystem {
 	private GridSystem    grid;
 
 	private const uint InitialRenderersCount = 128;
+	private static readonly Vector2UInt TextureResolution = new Vector2UInt(64, 64);
 
 	public RenderSystem(Game game, EntityManager entityManager, Camera cam) : base(game, true) {
 		em = entityManager;
@@ -34,6 +35,7 @@ public class RenderSystem : GameSystem {
 		for (var i = 0; i < InitialRenderersCount; i++) {
 			RendererFree[i] = true;
 		}
+
 	}
 
 	public RendererHandle AppendRenderer(Renderer renderer) {
@@ -86,6 +88,12 @@ public class RenderSystem : GameSystem {
 				var rect = new Rectangle(pos, cellSize);
 
 				DrawRectangleLinesEx(rect, 1, color);
+
+#if DEBUG
+				if (grid.Moved[cellIndex]) {
+					DrawRectangle((int)pos.X, (int)pos.Y, (int)cellSize.X, (int)cellSize.Y, Color.Magenta);
+				}
+#endif // DEBUG
 			}
 		}
 
@@ -99,7 +107,7 @@ public class RenderSystem : GameSystem {
 
 			switch (renderer.Shape) {
 				case ShapeType.Circle : {
-					DrawCircleV(entity.Position, 
+					DrawCircleV(entity.Position + renderer.Offset, 
 								renderer.Radius * entity.Scale.X, 
 								renderer.Color);
 				} break;
@@ -107,7 +115,8 @@ public class RenderSystem : GameSystem {
 					var center   = entity.Position;
 					var halfSize = renderer.Size * entity.Scale * 0.5f;
 					center      -= halfSize;
-
+					center 		+= renderer.Offset;
+					
 					DrawRectangleV(center,
 								   renderer.Size * entity.Scale,
 								   renderer.Color);
@@ -115,8 +124,25 @@ public class RenderSystem : GameSystem {
 				case ShapeType.Text : {
 					var center   = entity.Position;
 					center      += renderer.Offset;
-					Console.WriteLine(renderer.Text);
 					DrawText(renderer.Text, (int)center.X, (int)center.Y, renderer.FontSize, renderer.Color);
+				} break;
+				case ShapeType.Sprite : {
+					var center   = entity.Position;
+					var size     = renderer.Size * entity.Scale;
+					var halfSize = size * 0.5f;
+					center      -= halfSize;
+					center 		+= renderer.Offset;
+
+					var rect = new Rectangle(center.X, 
+											 center.Y, 
+											 size.X, 
+											 size.Y);
+					var txt  = new Rectangle(0, 
+											 0, 
+											 renderer.Texture.Width,
+											 renderer.Texture.Height);
+
+					DrawTexturePro(renderer.Texture, txt, rect, Vector2.Zero, entity.Orientation, renderer.Color);
 				} break;
 			}
 		}

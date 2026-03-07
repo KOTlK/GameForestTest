@@ -12,12 +12,11 @@ public enum ElementShape : byte {
 	None      = 0,
 	Circle    = 1,
 	Rectangle = 2,
-	Line      = 3,
 }
 
 public class Element : Entity {
-	public ElementColor Color;
-	public ElementShape Shape;
+	public ElementColor Color {get; private set;}
+	public ElementShape Shape { get; private set;}
 	public Vector2UInt  GridPosition;
 	public uint         Score;
 	public Vector2      SelectedScale = new Vector2(1.3f, 1.3f);
@@ -39,5 +38,30 @@ public class Element : Entity {
 
 	public void Deselect() {
 		Scale = UnselectedScale;
+	}
+
+	public void SetShape(ElementShape shape) {
+		Shape = shape;
+		// var render = Services<RenderSystem>.Get();
+
+		// ref var renderer = ref render.GetRenderer(Renderer);
+
+		// renderer.Shape = Shape switch {
+		// 	ElementShape.Circle    => ShapeType.Circle,
+		// 	ElementShape.Rectangle => ShapeType.Rectangle,
+		// };
+	}
+
+	public void SetColor(ElementColor color) {
+		Color = color;
+		// var render = Services<RenderSystem>.Get();
+
+		// ref var renderer = ref render.GetRenderer(Renderer);
+
+		// renderer.Color = Color switch {
+		// 	ElementColor.Green => Raylib_cs.Color.Green,
+		// 	ElementColor.Red   => Raylib_cs.Color.Red,
+		// 	ElementColor.Blue  => Raylib_cs.Color.Blue
+		// };
 	}
 }

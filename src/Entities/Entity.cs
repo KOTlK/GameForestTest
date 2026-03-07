@@ -35,6 +35,8 @@ public class Entity {
         var renderer = reader.Read<Renderer>(nameof(Renderer));
         renderer.Entity = Handle;
 
+        renderer.LoadAssets();
+
         var renderSystem = Services<RenderSystem>.Get();
 
         Renderer = renderSystem.AppendRenderer(renderer);

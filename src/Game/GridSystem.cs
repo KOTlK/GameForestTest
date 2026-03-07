@@ -23,6 +23,7 @@ public class GridSystem : GameSystem {
 	public Vector2UInt    Size;
 	public Vector2        CellSize;
 	public EntityHandle[] Elements;
+	public bool[] 		  Moved;
 	public int            SelectedCell = -1;
 
 	public bool CellSelected => SelectedCell >= 0;
@@ -62,6 +63,7 @@ public class GridSystem : GameSystem {
 		Size     = size;
 		CellSize = cellSize;
 		Elements = new EntityHandle[count];
+		Moved    = new bool[count];
 
 		for (var i = 0; i < count; i++) {
 			Elements[i] = EntityHandle.Zero;
@@ -106,11 +108,16 @@ public class GridSystem : GameSystem {
 				}
 			}
 		}
+
+		for (var i = 0; i < Moved.Length; i++) {
+			Moved[i] = false;
+		}
 	}
 
 	public void Fall() {
 		var animation = Game.GetSystem<GridAnimationSystem>();
 
+		// 0:0 is top left of the grid, so Size.y is at the bottom.
 		for (int y = (int)Size.y - 1; y >= 0; y--) {
 			for (uint x = 0; x < Size.x; x++) {
 				var pos = new Vector2UInt(x, (uint)y);
@@ -125,8 +132,10 @@ public class GridSystem : GameSystem {
 
 					if (em.GetEntity(Elements[GetCellIndex(top)], 
 						 			 out Element topElement)) {
-						RemoveElement(GetCellIndex(top));
-						SetElement(GetCellIndex(pos), topElement);
+						var topIndex  = GetCellIndex(top);
+						var currIndex = GetCellIndex(pos);
+						RemoveElement(topIndex);
+						SetElement(currIndex, topElement);
 						var transaction = new LinearTransaction(topElement.Handle,
 																GetCellCenter(top),
 															    GetCellCenter(pos),
@@ -134,6 +143,8 @@ public class GridSystem : GameSystem {
 
 						animation.AppendTransaction(transaction);
 						fell = true;
+						Moved[topIndex] = true;
+						Moved[currIndex] = true;
 						break;
 					}
 				}
@@ -142,15 +153,16 @@ public class GridSystem : GameSystem {
 					// Spawn random element above the grid and animate it.
 					var randomTargetPos = GetCellCenter(x, (uint)y);
 					var randomPos = randomTargetPos - new Vector2(0, CellSize.Y);
-					var element = MakeRandomElement(randomPos);
+					var element   = MakeRandomElement(randomPos);
 
 					var transaction = new LinearTransaction(element.Handle,
 															randomPos,
 															randomTargetPos,
 															fallDuration);
 					animation.AppendTransaction(transaction);
-
-					SetElement(GetCellIndex(x, (uint)y), element);
+					var index = GetCellIndex(x, (uint)y);
+					SetElement(index, element);
+					Moved[index] = true;
 				}
 			}
 		}
@@ -160,7 +172,7 @@ public class GridSystem : GameSystem {
 		var handle = Elements[index];
 		if (!em.GetEntity(handle, out Element element)) return;
 
-		if (element.Type == EntityType.Bonus) {
+		if (IsBonus(element.Type)) {
 			var bonus = (Bonus)element;
 			bonus.Activate(this);
 		} else {
@@ -205,6 +217,8 @@ public class GridSystem : GameSystem {
 									   	   switchDuration);
 
 			animSystem.AppendTransaction(sw);
+			Moved[a] = true;
+			Moved[b] = true;
 			return true;
 		} else {
 			RemoveElement(a);
@@ -228,12 +242,34 @@ public class GridSystem : GameSystem {
 		if (!em.GetEntity(Elements[GetCellIndex(pos)], out Element origin)) 
 			return;
 
+		bool spawnLine   = false;
+		bool lastFound   = false;
+		var  lineColor   = origin.Color;
+		var  lineShape   = origin.Shape;
+		var  lineCellPos = Vector2UInt.zero;
+		var  originIndex = GetCellIndex(pos);
+
+
+		if (match.HorizontalHits >= 4 || match.VerticalHits >= 4) {
+			spawnLine = true;
+			if (Moved[originIndex]) {
+				lastFound   = true;
+				lineCellPos = pos;
+			}
+		}
+
 		if (match.HorizontalHits >= 3) {
 			for (var x = pos.x + 1; x < Size.x; x++) {
 				var index = GetCellIndex(x, pos.y);
 		        if (!em.GetEntity(Elements[index], out Element e)) 
 		        	break;
 		        if (e.Shape == origin.Shape && e.Color == origin.Color) {
+		        	if (match.HorizontalHits >= 4 && 
+		        		Moved[index] 			  &&
+		        		lastFound == false) {
+		        		lastFound = true;
+		        		lineCellPos = new Vector2UInt(x, pos.y);
+		        	}
 		        	DestroyElement(index);
 		        }
 		        else break;
@@ -244,6 +280,12 @@ public class GridSystem : GameSystem {
 		        if (!em.GetEntity(Elements[index], out Element e)) 
 		        	break;
 		        if (e.Shape == origin.Shape && e.Color == origin.Color) {
+		        	if (match.HorizontalHits >= 4 && 
+		        		Moved[index] 			  &&
+		        		lastFound == false) {
+		        		lastFound = true;
+		        		lineCellPos = new Vector2UInt(x, pos.y);
+		        	}
 		        	DestroyElement(index);
 		        }
 		        else break;
@@ -256,6 +298,12 @@ public class GridSystem : GameSystem {
 		        if (!em.GetEntity(Elements[index], out Element e)) 
 		        	break;
 		        if (e.Shape == origin.Shape && e.Color == origin.Color) {
+		        	if (match.VerticalHits >= 4 && 
+		        		Moved[index] 			&&
+		        		lastFound == false) {
+		        		lastFound = true;
+		        		lineCellPos = new Vector2UInt(pos.x, y);
+		        	}
 		        	DestroyElement(index);
 		        }
 		        else break;
@@ -266,15 +314,28 @@ public class GridSystem : GameSystem {
 		        if (!em.GetEntity(Elements[index], out Element e)) 
 		        	break;
 		        if (e.Shape == origin.Shape && e.Color == origin.Color) {
+		        	if (match.VerticalHits >= 4 && 
+		        		Moved[index] 			&&
+		        		lastFound == false) {
+		        		lastFound = true;
+		        		lineCellPos = new Vector2UInt(pos.x, y);
+		        	}
 		        	DestroyElement(index);
 		        }
 		        else break;
 		    }
 		}
 
-		var originIndex = GetCellIndex(pos);
-
 		DestroyElement(originIndex);
+
+		if (spawnLine) {
+			var (_, line) = em.CreateEntity<Line>("line", 
+												  GetCellCenter(lineCellPos), 
+												  0);
+
+			line.SetShape(lineShape);
+			line.SetColor(lineColor);
+		}
 	}
 
 	public MatchResult TryMatchAtPosition(Vector2UInt pos) {
@@ -483,4 +544,41 @@ public class GridSystem : GameSystem {
 	           (rowDiff == 0 && colDiff == 1);
 	}
 
+	private Element GetLastMovedInHorizontalLine(Vector2UInt pos) {
+		var originIndex = GetCellIndex(pos);
+		if (!em.GetEntity(Elements[GetCellIndex(pos)], out Element origin))
+			return null;
+
+		if (Moved[originIndex]) return origin;
+
+		for (var x = pos.x + 1; x < Size.x; x++) {
+			var index = GetCellIndex(x, pos.y);
+	        if (!em.GetEntity(Elements[index], out Element e)) 
+	        	break;
+	        if (e.Shape == origin.Shape && e.Color == origin.Color) {
+	        	if (Moved[index]) {
+	        		return e;
+	        	}
+	        }
+	        else break;
+	    }
+
+	    for (var x = (int)pos.x - 1; x >= 0; x--) {
+	    	var index = GetCellIndex((uint)x, pos.y);
+	        if (!em.GetEntity(Elements[index], out Element e)) 
+	        	break;
+	        if (e.Shape == origin.Shape && e.Color == origin.Color) {
+	        	if (Moved[index]) {
+	        		return e;
+	        	}
+	        }
+	        else break;
+	    }
+
+	    return null;
+	}
+
+	private bool IsBonus(EntityType type) {
+		return type == EntityType.Line;
+	}
 }

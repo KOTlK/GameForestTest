@@ -1,11 +1,13 @@
 using Raylib_cs;
 using System.Numerics;
 
+// @Cleanup: use sprites instead.
 public enum ShapeType {
 	None      = 0,
 	Circle    = 1,
 	Rectangle = 2,
 	Text      = 3,
+	Sprite    = 4,
 }
 
 public struct Renderer {
@@ -17,23 +19,13 @@ public struct Renderer {
 	public Vector2   	Offset;
 	public int          FontSize;
 	public string       Text;
+	public Texture2D    Texture;
+	public string       TexturePath;
 
-	public void Deserializer(IDeserializer reader) {
-		reader.Read<Color>(nameof(Color));
-		reader.Read<ShapeType>(nameof(Shape));
-
-		switch(Shape) {
-			case ShapeType.Circle : {
-				reader.Read<float>(nameof(Radius));
-			} break;
-			case ShapeType.Rectangle : {
-				reader.Read<Vector2>(nameof(Size));
-			} break;
-			case ShapeType.Text : {
-				reader.Read<Vector2>(nameof(Offset));
-				reader.Read<int>(nameof(FontSize));
-				reader.Read<string>(nameof(Text));
-			} break;
+	public void LoadAssets() {
+		if (TexturePath != null) {
+			Console.WriteLine($"Loading {TexturePath}");
+			Texture = AssetManager.LoadAsset<Texture2D>(TexturePath);
 		}
 	}
 
