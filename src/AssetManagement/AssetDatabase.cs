@@ -66,6 +66,10 @@ public class AssetDatabase : ISerializer, IDeserializer {
 					Name    = "Shape",
 					Content = ElementShape.Circle
 				},
+				new AssetField() {
+					Name    = "Score",
+					Content = 1U
+				},
 			}
 		},
 		new AssetEntry() {
@@ -99,6 +103,10 @@ public class AssetDatabase : ISerializer, IDeserializer {
 				new AssetField() {
 					Name    = "Shape",
 					Content = ElementShape.Circle
+				},
+				new AssetField() {
+					Name    = "Score",
+					Content = 1U
 				},
 			}
 		},
@@ -134,6 +142,10 @@ public class AssetDatabase : ISerializer, IDeserializer {
 					Name    = "Shape",
 					Content = ElementShape.Circle
 				},
+				new AssetField() {
+					Name    = "Score",
+					Content = 1U
+				},
 			}
 		},
 		new AssetEntry() {
@@ -167,6 +179,10 @@ public class AssetDatabase : ISerializer, IDeserializer {
 				new AssetField() {
 					Name    = "Shape",
 					Content = ElementShape.Rectangle
+				},
+				new AssetField() {
+					Name    = "Score",
+					Content = 1U
 				},
 			}
 		},
@@ -202,6 +218,10 @@ public class AssetDatabase : ISerializer, IDeserializer {
 					Name    = "Shape",
 					Content = ElementShape.Rectangle
 				},
+				new AssetField() {
+					Name    = "Score",
+					Content = 1U
+				},
 			}
 		},
 		new AssetEntry() {
@@ -236,8 +256,40 @@ public class AssetDatabase : ISerializer, IDeserializer {
 					Name    = "Shape",
 					Content = ElementShape.Rectangle
 				},
+				new AssetField() {
+					Name    = "Score",
+					Content = 1U
+				},
 			}
 		},
+		new AssetEntry() {
+			Name = "score_ui",
+			Type = AssetType.Entity,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Type",
+					Content = EntityType.UI
+				},
+				new AssetField() {
+					Name    = "Flags",
+					Content = EntityFlags.Dynamic
+				},
+				new AssetField() {
+					Name    = "Scale",
+					Content = Vector2.One
+				},
+				new AssetField() {
+					Name    = "Renderer",
+					Content = new Renderer {
+						Color    = Color.Black,
+						Shape    = ShapeType.Text,
+						Text     = "Score: 0",
+						Offset   = new Vector2(0, 0),
+						FontSize = 3
+					}
+				},
+			}
+		}
 	};
 	public Dictionary<string, int> EntryByName = new() {
 		{
@@ -263,6 +315,10 @@ public class AssetDatabase : ISerializer, IDeserializer {
 		{
 			"blue_rectangle_element",
 			5
+		},
+		{
+			"score_ui",
+			6
 		}
 
 	};

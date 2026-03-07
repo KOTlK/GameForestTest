@@ -73,6 +73,9 @@ public class RenderSystem : GameSystem {
 		var gridSize = grid.Size;
 		var cellSize = grid.CellSize;
 
+		var sx = (float)gridSize.x * cellSize.X;
+		var sy = (float)gridSize.y * cellSize.Y;
+
 		for (uint y = 0; y < gridSize.y; y++) {
 			for (uint x = 0; x < gridSize.x; x++) {
 				var cellIndex = grid.GetCellIndex(x, y);
@@ -109,40 +112,15 @@ public class RenderSystem : GameSystem {
 								   renderer.Size * entity.Scale,
 								   renderer.Color);
 				} break;
+				case ShapeType.Text : {
+					var center   = entity.Position;
+					center      += renderer.Offset;
+					Console.WriteLine(renderer.Text);
+					DrawText(renderer.Text, (int)center.X, (int)center.Y, renderer.FontSize, renderer.Color);
+				} break;
 			}
 		}
 
-		// // Render entities
-		// for (var i = 1; i < em.MaxEntitiesCount; i++) {
-		// 	if (em.Free[i]) continue;
-
-		// 	var entity = em.Entities[i];
-
-		// 	if (entity.Renderer.Id == 0) continue;
-
-		// 	Assert(RendererFree[entity.Renderer.Id] == false, 
-		// 		   "Trying to draw empty renderer. (%)", entity.Renderer.Id);
-
-		// 	var renderer = Renderers[entity.Renderer.Id];
-
-
-		// 	switch (renderer.Shape) {
-		// 		case ShapeType.Circle : {
-		// 			DrawCircleV(entity.Position, 
-		// 						renderer.Radius * entity.Scale.X, 
-		// 						renderer.Color);
-		// 		} break;
-		// 		case ShapeType.Rectangle : {
-		// 			var center   = entity.Position;
-		// 			var halfSize = renderer.Size * entity.Scale * 0.5f;
-		// 			center      -= halfSize;
-
-		// 			DrawRectangleV(center,
-		// 						   renderer.Size * entity.Scale,
-		// 						   renderer.Color);
-		// 		} break;
-		// 	}
-		// }
 		EndMode2D();
 
         DrawText("Hello, world!", 0, 0, 20, Color.Black);

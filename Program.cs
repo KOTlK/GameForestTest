@@ -13,6 +13,9 @@ internal static class Program {
 
     [System.STAThread]
     public static void Main() {
+        InitWindow(WindowWidth, WindowHeight, "Hello World");
+        Events.Init();
+        
         var camera = new Camera(new Vector2(WindowWidth / 2f, WindowHeight / 2f),
                                 Vector2.Zero,
                                 1.0f);
@@ -26,11 +29,13 @@ internal static class Program {
                                         gridSize,
                                         cellSize);
         var animationSystem = new GridAnimationSystem(game, entityManager);
+        var score           = new ScoreSystem(game);
         var random = new Random();
 
         game.AppendSystem(emUpdateSystem);
         game.AppendSystem(gridSystem);
         game.AppendSystem(animationSystem);
+        game.AppendSystem(score);
         var render = new RenderSystem(game, entityManager, camera);
         game.AppendSystem(render);
 
@@ -38,8 +43,11 @@ internal static class Program {
         Services<EntityManager>.Create(entityManager);
         Services<GridSystem>.Create(gridSystem);
         Services<RenderSystem>.Create(render);
+        Services<ScoreSystem>.Create(score);
 
-        InitWindow(WindowWidth, WindowHeight, "Hello World");
+        // @Temp: Now ui renders in world space.
+        var scoreUI = entityManager.CreateEntity<ScoreUI>("score_ui", new Vector2(-70, 0), 0);
+
 
         camera.AlignWithGrid(gridSystem.Size, gridSystem.CellSize, new Vector2(10, 10));
 

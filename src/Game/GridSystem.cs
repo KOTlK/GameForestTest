@@ -69,7 +69,6 @@ public class GridSystem : GameSystem {
 	}
 
 	public override void Update() {
-		// Match();
 		var animation = Game.GetSystem<GridAnimationSystem>();
 
 		if (animation.AllTransactionsOver) {
@@ -86,8 +85,6 @@ public class GridSystem : GameSystem {
 				PutElement(new Vector2UInt(x, y), element);
 			}
 		}
-
-		Match();
 	}
 
 	public Element MakeRandomElement(Vector2 position) {
@@ -159,6 +156,21 @@ public class GridSystem : GameSystem {
 		}
 	}
 
+	public void DestroyElement(uint index) {
+		var handle = Elements[index];
+		if (!em.GetEntity(handle, out Element element)) return;
+
+		if (element.Type == EntityType.Bonus) {
+			var bonus = (Bonus)element;
+			bonus.Activate(this);
+		} else {
+			Services<ScoreSystem>.Get().Add(element.Score);
+		}
+
+		element.DestroyThisEntity();
+		RemoveElement(index);
+	}
+
 	public bool TrySwitchPositions(uint a, uint b) {
 		var aHandle = Elements[a];
 		var bHandle = Elements[b];
@@ -222,8 +234,7 @@ public class GridSystem : GameSystem {
 		        if (!em.GetEntity(Elements[index], out Element e)) 
 		        	break;
 		        if (e.Shape == origin.Shape && e.Color == origin.Color) {
-		        	e.DestroyThisEntity();
-		        	RemoveElement(index);
+		        	DestroyElement(index);
 		        }
 		        else break;
 		    }
@@ -233,8 +244,7 @@ public class GridSystem : GameSystem {
 		        if (!em.GetEntity(Elements[index], out Element e)) 
 		        	break;
 		        if (e.Shape == origin.Shape && e.Color == origin.Color) {
-		        	e.DestroyThisEntity();
-		        	RemoveElement(index);
+		        	DestroyElement(index);
 		        }
 		        else break;
 		    }
@@ -246,8 +256,7 @@ public class GridSystem : GameSystem {
 		        if (!em.GetEntity(Elements[index], out Element e)) 
 		        	break;
 		        if (e.Shape == origin.Shape && e.Color == origin.Color) {
-		        	e.DestroyThisEntity();
-		        	RemoveElement(index);
+		        	DestroyElement(index);
 		        }
 		        else break;
 		    }
@@ -257,15 +266,15 @@ public class GridSystem : GameSystem {
 		        if (!em.GetEntity(Elements[index], out Element e)) 
 		        	break;
 		        if (e.Shape == origin.Shape && e.Color == origin.Color) {
-		        	e.DestroyThisEntity();
-		        	RemoveElement(index);
+		        	DestroyElement(index);
 		        }
 		        else break;
 		    }
 		}
 
-		origin.DestroyThisEntity();
-		RemoveElement(GetCellIndex(pos));
+		var originIndex = GetCellIndex(pos);
+
+		DestroyElement(originIndex);
 	}
 
 	public MatchResult TryMatchAtPosition(Vector2UInt pos) {
