@@ -391,6 +391,19 @@ public class AssetDatabase : ISerializer, IDeserializer {
 						TexturePath = "assets/textures/destroyer.png",
 					}
 				},
+				// Need shape, color and score here to shut up asserts.
+				new AssetField() {
+					Name    = "Shape",
+					Content = ElementShape.None
+				},
+				new AssetField() {
+					Name    = "Color",
+					Content = ElementColor.None
+				},
+				new AssetField() {
+					Name    = "Score",
+					Content = 0U
+				},
 			}
 		},
 		new AssetEntry() {
@@ -460,6 +473,156 @@ public class AssetDatabase : ISerializer, IDeserializer {
 				}
 			}
 		},
+		new AssetEntry() {
+			Name = "play_button",
+			Type = AssetType.Entity,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Type",
+					Content = EntityType.UI
+				},
+				new AssetField() {
+					Name    = "Flags",
+					Content = EntityFlags.None
+				},
+				new AssetField() {
+					Name    = "Scale",
+					Content = Vector2.One
+				},
+				new AssetField() {
+					Name    = "Renderer",
+					Content = new Renderer {
+						Color    = Color.SkyBlue,
+						Shape    = ShapeType.Sprite,
+						Size     = new Vector2(30, 20),
+						TexturePath = "assets/textures/rect.png"
+					}
+				},
+				new AssetField() {
+					Name    = "Size",
+					Content = new Vector2(30, 20)
+				},
+				new AssetField() {
+					Name    = "TextColor",
+					Content = Color.Red
+				},
+				new AssetField() {
+					Name    = "TextOffset",
+					Content = new Vector2(-9.5f, -5f)
+				},
+				new AssetField() {
+					Name    = "FontSize",
+					Content = 3
+				},
+				new AssetField() {
+					Name    = "Text",
+					Content = "Play"
+				},
+			}
+		},
+		new AssetEntry() {
+			Name = "exit_button",
+			Type = AssetType.Entity,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Type",
+					Content = EntityType.UI
+				},
+				new AssetField() {
+					Name    = "Flags",
+					Content = EntityFlags.None
+				},
+				new AssetField() {
+					Name    = "Scale",
+					Content = Vector2.One
+				},
+				new AssetField() {
+					Name    = "Renderer",
+					Content = new Renderer {
+						Color    = Color.SkyBlue,
+						Shape    = ShapeType.Sprite,
+						Size     = new Vector2(30, 20),
+						TexturePath = "assets/textures/rect.png"
+					}
+				},
+				new AssetField() {
+					Name    = "Size",
+					Content = new Vector2(30, 20)
+				},
+				new AssetField() {
+					Name    = "TextColor",
+					Content = Color.Red
+				},
+				new AssetField() {
+					Name    = "TextOffset",
+					Content = new Vector2(-5, -5)
+				},
+				new AssetField() {
+					Name    = "FontSize",
+					Content = 3
+				},
+				new AssetField() {
+					Name    = "Text",
+					Content = "Ok"
+				},
+			}
+		},
+		new AssetEntry() {
+			Name = "time_ui",
+			Type = AssetType.Entity,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Type",
+					Content = EntityType.UI
+				},
+				new AssetField() {
+					Name    = "Flags",
+					Content = EntityFlags.None
+				},
+				new AssetField() {
+					Name    = "Scale",
+					Content = Vector2.One
+				},
+				new AssetField() {
+					Name    = "Renderer",
+					Content = new Renderer {
+						Color    = Color.Black,
+						Shape    = ShapeType.Text,
+						Text     = "Time left: 0",
+						Offset   = new Vector2(0, 0),
+						FontSize = 3
+					}
+				},
+			}
+		},
+		new AssetEntry() {
+			Name = "text",
+			Type = AssetType.Entity,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Type",
+					Content = EntityType.UI
+				},
+				new AssetField() {
+					Name    = "Flags",
+					Content = EntityFlags.None
+				},
+				new AssetField() {
+					Name    = "Scale",
+					Content = Vector2.One
+				},
+				new AssetField() {
+					Name    = "Renderer",
+					Content = new Renderer {
+						Color    = Color.Black,
+						Shape    = ShapeType.Text,
+						Text     = "Hello world!",
+						Offset   = new Vector2(0, 0),
+						FontSize = 3
+					}
+				},
+			}
+		},
 	};
 	public Dictionary<string, int> EntryByName = new() {
 		{
@@ -521,6 +684,22 @@ public class AssetDatabase : ISerializer, IDeserializer {
 		{
 			"assets/textures/bomb.png",
 			14
+		},
+		{
+			"play_button",
+			15
+		},
+		{
+			"exit_button",
+			16
+		},
+		{
+			"time_ui",
+			17
+		},
+		{
+			"text",
+			18
 		},
 	};
 

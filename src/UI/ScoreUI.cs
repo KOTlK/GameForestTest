@@ -24,6 +24,5 @@ public class ScoreUI : UIElement {
 
     private void OnScoreChanged(ScoreChangedEvent evnt) {
     	TargetScore = evnt.NewScore;
-    	Console.WriteLine(TargetScore);
     }
 }

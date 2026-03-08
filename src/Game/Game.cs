@@ -39,7 +39,9 @@ public class Game {
 		var type = typeof(T);
 		Assert(_systemByType.ContainsKey(type), "Cannot enable system. It is not registered.");
 		var system = _systemByType[type];
-		Assert(system.Enabled == false, "Cannot enable system. It is already enabled.");
+
+		if (system.Enabled) return;
+		
 		system.OnEnable();
 		system.Enabled = true;
 	}
@@ -49,7 +51,9 @@ public class Game {
 		var type = typeof(T);
 		Assert(_systemByType.ContainsKey(type), "Cannot disable system. It is not registered.");
 		var system = _systemByType[type];
-		Assert(system.Enabled == true, "Cannot disable system. It is already disabled.");
+
+		if (!system.Enabled) return;
+
 		system.OnDisable();
 		system.Enabled = false;
 	}

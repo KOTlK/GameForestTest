@@ -43,4 +43,8 @@ public class Camera {
 	public Vector2 GetPointerWorldPos() {
 		return Raylib.GetScreenToWorld2D(Raylib.GetMousePosition(), RaylibCamera);
 	}
+
+	public Vector2 ScreenToWorldPoint(Vector2 screen) {
+		return Raylib.GetScreenToWorld2D(screen, RaylibCamera);
+	}
 }

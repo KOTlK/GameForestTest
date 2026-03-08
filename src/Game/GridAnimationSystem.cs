@@ -30,4 +30,8 @@ public class GridAnimationSystem : GameSystem {
 			}
 		}
 	}
+
+	public override void OnDisable() {
+		Transactions.Clear();
+	}
 }

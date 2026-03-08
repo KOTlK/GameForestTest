@@ -106,7 +106,6 @@ public class EntityManager {
         Tags[id]     = tag;
         Flags[id]    = obj.Flags;
 
-
         EntitiesByType[obj.Type].Add(handle.Id);
 
         if((obj.Flags & EntityFlags.Dynamic) == EntityFlags.Dynamic) {

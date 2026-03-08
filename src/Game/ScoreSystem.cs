@@ -5,6 +5,14 @@ public class ScoreSystem : GameSystem {
 
 	}
 
+	public override void OnEnable() {
+		Reset();
+	}
+	
+	public override void OnDisable() {
+		Reset();
+	}
+
 	public void Reset() {
 		var evnt = new ScoreChangedEvent();
 		evnt.OldScore = score;
@@ -21,4 +29,5 @@ public class ScoreSystem : GameSystem {
 
 		Events.RaiseGeneral(evnt);
 	}
+
 }

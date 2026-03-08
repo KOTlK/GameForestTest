@@ -25,7 +25,6 @@ public class RenderSystem : GameSystem {
 	private GridSystem    grid;
 
 	private const uint InitialRenderersCount = 128;
-	private static readonly Vector2UInt TextureResolution = new Vector2UInt(64, 64);
 
 	public RenderSystem(Game game, EntityManager entityManager, Camera cam) : base(game, true) {
 		em = entityManager;
@@ -71,30 +70,33 @@ public class RenderSystem : GameSystem {
 
 		BeginMode2D(camera.RaylibCamera);
 
-		// @Cleanup: For now it's just lines, switch to shader later.
-		var gridSize = grid.Size;
-		var cellSize = grid.CellSize;
+		if (grid.Enabled) {
+			// @Cleanup: For now it's just lines, switch to shader later.
+			var gridSize = grid.Size;
+			var cellSize = grid.CellSize;
 
-		var sx = (float)gridSize.x * cellSize.X;
-		var sy = (float)gridSize.y * cellSize.Y;
+			var sx = (float)gridSize.x * cellSize.X;
+			var sy = (float)gridSize.y * cellSize.Y;
 
-		for (uint y = 0; y < gridSize.y; y++) {
-			for (uint x = 0; x < gridSize.x; x++) {
-				var cellIndex = grid.GetCellIndex(x, y);
-				var color     = cellIndex == grid.SelectedCell ? Color.Green : 
-																 Color.Beige;
-				var pos = new Vector2(x * cellSize.X,
-									  y * cellSize.Y);
-				var rect = new Rectangle(pos, cellSize);
+			for (uint y = 0; y < gridSize.y; y++) {
+				for (uint x = 0; x < gridSize.x; x++) {
+					var cellIndex = grid.GetCellIndex(x, y);
+					var color     = cellIndex == grid.SelectedCell ? Color.Green : 
+																	 Color.Beige;
+					var pos = new Vector2(x * cellSize.X,
+										  y * cellSize.Y);
+					var rect = new Rectangle(pos, cellSize);
 
-				DrawRectangleLinesEx(rect, 1, color);
+					DrawRectangleLinesEx(rect, 1, color);
 
 #if true
-				if (grid.Moved[cellIndex]) {
-					DrawRectangle((int)pos.X, (int)pos.Y, (int)cellSize.X, (int)cellSize.Y, Color.Magenta);
+					if (grid.Moved[cellIndex]) {
+						DrawRectangle((int)pos.X, (int)pos.Y, (int)cellSize.X, (int)cellSize.Y, Color.Magenta);
+					}
+#endif 	
 				}
-#endif 
 			}
+
 		}
 
 		// Render entities.
@@ -103,29 +105,16 @@ public class RenderSystem : GameSystem {
 
 			var renderer = Renderers[i];
 
+			if (renderer.Shape == ShapeType.Text) continue;
+
 			if (!em.GetEntity(renderer.Entity, out Entity entity)) continue;
 
 			switch (renderer.Shape) {
-				// case ShapeType.Circle : {
-				// 	DrawCircleV(entity.Position + renderer.Offset, 
-				// 				renderer.Radius * entity.Scale.X, 
-				// 				renderer.Color);
-				// } break;
-				// case ShapeType.Rectangle : {
+				// case ShapeType.Text : {
 				// 	var center   = entity.Position;
-				// 	var halfSize = renderer.Size * entity.Scale * 0.5f;
-				// 	center      -= halfSize;
-				// 	center 		+= renderer.Offset;
-					
-				// 	DrawRectangleV(center,
-				// 				   renderer.Size * entity.Scale,
-				// 				   renderer.Color);
+				// 	center      += renderer.Offset;
+				// 	DrawText(renderer.Text, (int)center.X, (int)center.Y, renderer.FontSize, renderer.Color);
 				// } break;
-				case ShapeType.Text : {
-					var center   = entity.Position;
-					center      += renderer.Offset;
-					DrawText(renderer.Text, (int)center.X, (int)center.Y, renderer.FontSize, renderer.Color);
-				} break;
 				case ShapeType.Sprite : {
 					var center   = entity.Position;
 					var size     = renderer.Size * entity.Scale;
@@ -148,12 +137,26 @@ public class RenderSystem : GameSystem {
 								   entity.Orientation, 
 								   renderer.Color);
 				} break;
+				default : break;
+			}
+		}
+
+		// @Cleanup: I don't want to make render queues, so i render text after all other entities to make buttons work correctly. :)
+		for (var i = 1; i < RenderersCount; i++) {
+			if (RendererFree[i]) continue;
+
+			var renderer = Renderers[i];
+
+			if (!em.GetEntity(renderer.Entity, out Entity entity)) continue;
+
+			if (renderer.Shape == ShapeType.Text) {
+				var center   = entity.Position;
+				center      += renderer.Offset;
+				DrawText(renderer.Text, (int)center.X, (int)center.Y, renderer.FontSize, renderer.Color);
 			}
 		}
 
 		EndMode2D();
-
-        DrawText("Hello, world!", 0, 0, 20, Color.Black);
 
 		EndDrawing();
 	}
