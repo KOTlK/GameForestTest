@@ -15,9 +15,23 @@ public static class Mathf {
 	}
 
 	public static Vector2 PingPong(Vector2 start, Vector2 end, float t) {
-        t = Math.Max(0f, Math.Min(1f, t));
-        float pingPong = MathF.Abs(t * 2f - 1f);
+        float pingPong = 1f - MathF.Abs((t % 1f) * 2f - 1f);
+    	return Vector2.Lerp(start, end, pingPong);
 
-        return Vector2.Lerp(start, end, pingPong);
+    }
+
+    public static float Radians(float degrees) {
+    	 return degrees * 0.01745329251f;
+    }
+
+    public static float Degrees(float radians) {
+    	return radians * 57.29577951308f;
+    }
+
+    public static int Clamp(int val, int min, int max) {
+    	if (val < min) 		val = min;
+    	else if (val > max) val = max;
+
+    	return val;
     }
 }

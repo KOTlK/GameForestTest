@@ -9,7 +9,6 @@ public class LinearTransaction : Transaction {
 	public event Action<Entity> OnTransactionOver = delegate {};
 
 	private float timePassed = 0f;
-	private const float epsilon = 0.01f;
 
 	public LinearTransaction(EntityHandle   entity, 
 							 Vector2        from,

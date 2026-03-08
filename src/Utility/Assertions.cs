@@ -13,7 +13,7 @@ public static class Assertions {
            [CallerFilePath]   string        filePath     = "",
            [CallerLineNumber] int           lineNumber   = 0) {
         if(!expr) {
-            Console.Write($"Assert failed at {filePath}:{lineNumber}. {errorMessage}");
+            Console.WriteLine($"Assert failed at {filePath}:{lineNumber}. {errorMessage}");
         }
     }
 
@@ -42,7 +42,7 @@ public static class Assertions {
                 switch(errorMessage[i]) {
                     case '%' :
                         if (cur >= args.Length) {
-                            Console.Write("Number of arguments provided to a format function does not match.");
+                            Console.WriteLine("Number of arguments provided to a format function does not match.");
                             sb.Clear();
                             return;
                         }
@@ -54,7 +54,7 @@ public static class Assertions {
                 }
             }
 
-            Console.Write(sb.ToString());
+            Console.WriteLine(sb.ToString());
 
             sb.Clear();
         }

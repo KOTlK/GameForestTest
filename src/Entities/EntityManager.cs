@@ -175,7 +175,9 @@ public class EntityManager {
         while(next > 0) {
             var current = next;
             next = NextDynamic[next];
-            Entities[current].UpdateEntity();
+            if (!Free[current]) {
+                Entities[current].UpdateEntity();
+            }
         }
     }
 

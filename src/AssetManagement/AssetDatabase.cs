@@ -314,11 +314,23 @@ public class AssetDatabase : ISerializer, IDeserializer {
 					Content = Vector2.One
 				},
 				new AssetField() {
+					Name    = "Score",
+					Content = 1U
+				},
+				new AssetField() {
+					Name    = "Color",
+					Content = ElementColor.None
+				},
+				new AssetField() {
+					Name    = "Shape",
+					Content = ElementShape.None
+				},
+				new AssetField() {
 					Name    = "Renderer",
 					Content = new Renderer {
 						Color       = Color.Yellow,
 						Shape       = ShapeType.Sprite,
-						Size        = new Vector2(10, 10),
+						Size        = new Vector2(20, 20),
 						TexturePath = "assets/textures/line.png",
 					}
 				},
@@ -353,7 +365,101 @@ public class AssetDatabase : ISerializer, IDeserializer {
 					Content = "assets/textures/line.png"
 				}
 			}
-		}
+		},
+		new AssetEntry() {
+			Name = "destroyer",
+			Type = AssetType.Entity,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Type",
+					Content = EntityType.Destroyer
+				},
+				new AssetField() {
+					Name    = "Flags",
+					Content = EntityFlags.Dynamic
+				},
+				new AssetField() {
+					Name    = "Scale",
+					Content = Vector2.One
+				},
+				new AssetField() {
+					Name    = "Renderer",
+					Content = new Renderer {
+						Color       = Color.Magenta,
+						Shape       = ShapeType.Sprite,
+						Size        = new Vector2(20, 20),
+						TexturePath = "assets/textures/destroyer.png",
+					}
+				},
+			}
+		},
+		new AssetEntry() {
+			Name   = "assets/textures/destroyer.png",
+			Type   = AssetType.Texture,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Path",
+					Content = "assets/textures/destroyer.png"
+				}
+			}
+		},
+		new AssetEntry() {
+			Name = "bomb",
+			Type = AssetType.Entity,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Type",
+					Content = EntityType.Bomb
+				},
+				new AssetField() {
+					Name    = "Flags",
+					Content = EntityFlags.None
+				},
+				new AssetField() {
+					Name    = "Scale",
+					Content = Vector2.One
+				},
+				new AssetField() {
+					Name    = "Score",
+					Content = 1U
+				},
+				new AssetField() {
+					Name    = "Color",
+					Content = ElementColor.None
+				},
+				new AssetField() {
+					Name    = "Shape",
+					Content = ElementShape.None
+				},
+				new AssetField() {
+					Name    = "Radius",
+					Content = 1
+				},
+				new AssetField() {
+					Name    = "Timeout",
+					Content = 0.25f
+				},
+				new AssetField() {
+					Name    = "Renderer",
+					Content = new Renderer {
+						Color       = Color.Yellow,
+						Shape       = ShapeType.Sprite,
+						Size        = new Vector2(20, 20),
+						TexturePath = "assets/textures/bomb.png",
+					}
+				},
+			}
+		},
+		new AssetEntry() {
+			Name   = "assets/textures/bomb.png",
+			Type   = AssetType.Texture,
+			Fields = new List<AssetField>() {
+				new AssetField() {
+					Name    = "Path",
+					Content = "assets/textures/bomb.png"
+				}
+			}
+		},
 	};
 	public Dictionary<string, int> EntryByName = new() {
 		{
@@ -399,8 +505,23 @@ public class AssetDatabase : ISerializer, IDeserializer {
 		{
 			"assets/textures/line.png",
 			10
-		}
-
+		},
+		{
+			"destroyer",
+			11
+		},
+		{
+			"assets/textures/destroyer.png",
+			12
+		},
+		{
+			"bomb",
+			13
+		},
+		{
+			"assets/textures/bomb.png",
+			14
+		},
 	};
 
 	private Dictionary<string, Texture2D> loadedTextures = new();

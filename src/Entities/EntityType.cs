@@ -3,5 +3,6 @@ public enum EntityType : uint {
     Element   = 1,
     Line      = 2,
     Destroyer = 3,
-    UI        = 4,
+    Bomb      = 4,
+    UI        = 5,
 }

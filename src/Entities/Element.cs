@@ -42,26 +42,18 @@ public class Element : Entity {
 
 	public void SetShape(ElementShape shape) {
 		Shape = shape;
-		// var render = Services<RenderSystem>.Get();
-
-		// ref var renderer = ref render.GetRenderer(Renderer);
-
-		// renderer.Shape = Shape switch {
-		// 	ElementShape.Circle    => ShapeType.Circle,
-		// 	ElementShape.Rectangle => ShapeType.Rectangle,
-		// };
 	}
 
 	public void SetColor(ElementColor color) {
 		Color = color;
-		// var render = Services<RenderSystem>.Get();
+		var render = Services<RenderSystem>.Get();
 
-		// ref var renderer = ref render.GetRenderer(Renderer);
+		ref var renderer = ref render.GetRenderer(Renderer);
 
-		// renderer.Color = Color switch {
-		// 	ElementColor.Green => Raylib_cs.Color.Green,
-		// 	ElementColor.Red   => Raylib_cs.Color.Red,
-		// 	ElementColor.Blue  => Raylib_cs.Color.Blue
-		// };
+		renderer.Color = Color switch {
+			ElementColor.Green => Raylib_cs.Color.Green,
+			ElementColor.Red   => Raylib_cs.Color.Red,
+			ElementColor.Blue  => Raylib_cs.Color.Blue
+		};
 	}
 }

@@ -89,11 +89,11 @@ public class RenderSystem : GameSystem {
 
 				DrawRectangleLinesEx(rect, 1, color);
 
-#if DEBUG
+#if true
 				if (grid.Moved[cellIndex]) {
 					DrawRectangle((int)pos.X, (int)pos.Y, (int)cellSize.X, (int)cellSize.Y, Color.Magenta);
 				}
-#endif // DEBUG
+#endif 
 			}
 		}
 
@@ -106,21 +106,21 @@ public class RenderSystem : GameSystem {
 			if (!em.GetEntity(renderer.Entity, out Entity entity)) continue;
 
 			switch (renderer.Shape) {
-				case ShapeType.Circle : {
-					DrawCircleV(entity.Position + renderer.Offset, 
-								renderer.Radius * entity.Scale.X, 
-								renderer.Color);
-				} break;
-				case ShapeType.Rectangle : {
-					var center   = entity.Position;
-					var halfSize = renderer.Size * entity.Scale * 0.5f;
-					center      -= halfSize;
-					center 		+= renderer.Offset;
+				// case ShapeType.Circle : {
+				// 	DrawCircleV(entity.Position + renderer.Offset, 
+				// 				renderer.Radius * entity.Scale.X, 
+				// 				renderer.Color);
+				// } break;
+				// case ShapeType.Rectangle : {
+				// 	var center   = entity.Position;
+				// 	var halfSize = renderer.Size * entity.Scale * 0.5f;
+				// 	center      -= halfSize;
+				// 	center 		+= renderer.Offset;
 					
-					DrawRectangleV(center,
-								   renderer.Size * entity.Scale,
-								   renderer.Color);
-				} break;
+				// 	DrawRectangleV(center,
+				// 				   renderer.Size * entity.Scale,
+				// 				   renderer.Color);
+				// } break;
 				case ShapeType.Text : {
 					var center   = entity.Position;
 					center      += renderer.Offset;
@@ -130,7 +130,6 @@ public class RenderSystem : GameSystem {
 					var center   = entity.Position;
 					var size     = renderer.Size * entity.Scale;
 					var halfSize = size * 0.5f;
-					center      -= halfSize;
 					center 		+= renderer.Offset;
 
 					var rect = new Rectangle(center.X, 
@@ -142,7 +141,12 @@ public class RenderSystem : GameSystem {
 											 renderer.Texture.Width,
 											 renderer.Texture.Height);
 
-					DrawTexturePro(renderer.Texture, txt, rect, Vector2.Zero, entity.Orientation, renderer.Color);
+					DrawTexturePro(renderer.Texture, 
+								   txt, 
+								   rect, 
+								   halfSize, // pivot
+								   entity.Orientation, 
+								   renderer.Color);
 				} break;
 			}
 		}

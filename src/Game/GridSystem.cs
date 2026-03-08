@@ -2,23 +2,6 @@ using System.Numerics;
 
 using static Assertions;
 
-public struct MatchResult {
-	public uint HorizontalHits;
-	public uint VerticalHits;
-
-	public MatchResult(uint h, uint v) {
-		HorizontalHits = h;
-		VerticalHits   = v;
-	}
-
-	public static readonly MatchResult Zero = new MatchResult(0, 0);
-
-	public bool MatchThreeOrMore() {
-		return HorizontalHits >= 3 ||
-			   VerticalHits >= 3;
-	}
-}
-
 public class GridSystem : GameSystem {
 	public Vector2UInt    Size;
 	public Vector2        CellSize;
@@ -34,13 +17,14 @@ public class GridSystem : GameSystem {
 	private const float switchDuration       = 0.2f;
 	private const float failedSwitchDuration = 0.2f;
 	private const float fallDuration         = 0.2f;
+	private const float destroyerDuration    = 0.05f;
 
 	private string[] 	  elements = new string[] {
 		"green_circle_element",
 		"red_circle_element",
 		"blue_circle_element",
 		"green_rectangle_element",
-		"red_rectangle_element",
+		// "red_rectangle_element",
 		// "blue_rectangle_element",
 	};
 
@@ -76,7 +60,10 @@ public class GridSystem : GameSystem {
 		if (animation.AllTransactionsOver) {
 			Match();
 		}
-		Fall();
+
+		if (animation.AllTransactionsOver) {
+			Fall();
+		}
 	}
 
 	public void FillRandom() {
@@ -101,6 +88,8 @@ public class GridSystem : GameSystem {
 		for (uint y = 0; y < Size.y; y++) {
 			for (uint x = 0; x < Size.x; x++) {
 				var position = new Vector2UInt(x, y);
+
+				// if (Moved[GetCellIndex(position)]) continue;
 				var match = TryMatchAtPosition(position);
 
 				if (match.MatchThreeOrMore()) {
@@ -172,6 +161,8 @@ public class GridSystem : GameSystem {
 		var handle = Elements[index];
 		if (!em.GetEntity(handle, out Element element)) return;
 
+		RemoveElement(index);
+
 		if (IsBonus(element.Type)) {
 			var bonus = (Bonus)element;
 			bonus.Activate(this);
@@ -179,8 +170,9 @@ public class GridSystem : GameSystem {
 			Services<ScoreSystem>.Get().Add(element.Score);
 		}
 
+		if (element.Type == EntityType.Bomb) return;
+
 		element.DestroyThisEntity();
-		RemoveElement(index);
 	}
 
 	public bool TrySwitchPositions(uint a, uint b) {
@@ -239,145 +231,347 @@ public class GridSystem : GameSystem {
 	}
 
 	public void Match(Vector2UInt pos, MatchResult match) {
+		// if (!em.GetEntity(Elements[GetCellIndex(pos)], out Element origin)) 
+		// 	return;
+
+		// bool spawnBomb   = false;
+		// bool spawnLine   = false;
+		// bool lastFound   = false;
+		// var  lineColor   = origin.Color;
+		// // var  lineShape   = origin.Shape;
+		// var  lineCellPos = pos;
+		// var  originIndex = GetCellIndex(pos);
+		// var  bombCellPos = pos;
+		// var  bombColor   = origin.Color;
+
+		// if (match.CanSpawnBomb(this, pos)) {
+		// 	spawnBomb = true;
+		// } else if (match.CanSpawnLine()) {
+		// 	spawnLine = true;
+		// 	if (Moved[originIndex]) {
+		// 		lastFound   = true;
+		// 		lineCellPos = pos;
+		// 	}
+		// }
+
+		// if (match.HorizontalHits >= 3) {
+		// 	for (var x = pos.x + 1; x < Size.x; x++) {
+		// 		var index = GetCellIndex(x, pos.y);
+		//         if (!em.GetEntity(Elements[index], out Element e)) 
+		//         	break;
+		//         if (CanMatch(e, origin)) {
+		//         	if (match.HorizontalHits >= 4 && 
+		//         		Moved[index] 			  &&
+		//         		lastFound == false) {
+		//         		lastFound = true;
+		//         		lineCellPos = new Vector2UInt(x, pos.y);
+		//         	}
+
+		//         	if (spawnBomb &&
+		//         		Moved[index]) {
+		//         		bombCellPos = new Vector2UInt(x, pos.y);
+		//         	}
+
+		//         	DestroyElement(index);
+		//         }
+		//         else break;
+		//     }
+
+		//     for (var x = (int)pos.x - 1; x >= 0; x--) {
+		//     	var index = GetCellIndex((uint)x, pos.y);
+		//         if (!em.GetEntity(Elements[index], out Element e)) 
+		//         	break;
+		//         if (CanMatch(e, origin)) {
+		//         	if (match.HorizontalHits >= 4 && 
+		//         		Moved[index] 			  &&
+		//         		lastFound == false) {
+		//         		lastFound = true;
+		//         		lineCellPos = new Vector2UInt(x, pos.y);
+		//         	}
+
+		//         	if (spawnBomb &&
+		//         		Moved[index]) {
+		//         		bombCellPos = new Vector2UInt(x, pos.y);
+		//         	}
+
+		//         	DestroyElement(index);
+		//         }
+		//         else break;
+		//     }
+		// }
+
+		// if (match.VerticalHits >= 3) {
+		// 	for (var y = pos.y + 1; y < Size.y; y++) {
+		// 		var index = GetCellIndex(pos.x, y);
+		//         if (!em.GetEntity(Elements[index], out Element e)) 
+		//         	break;
+		//         if (CanMatch(e, origin)) {
+		//         	if (match.VerticalHits >= 4 && 
+		//         		Moved[index] 			&&
+		//         		lastFound == false) {
+		//         		lastFound = true;
+		//         		lineCellPos = new Vector2UInt(pos.x, y);
+		//         	}
+
+		//         	if (spawnBomb &&
+		//         		Moved[index]) {
+		//         		bombCellPos = new Vector2UInt(pos.x, y);
+		//         	}
+
+		//         	DestroyElement(index);
+		//         }
+		//         else break;
+		//     }
+
+		//     for (var y = (int)pos.y - 1; y >= 0; y--) {
+		//     	var index = GetCellIndex(pos.x, (uint)y);
+		//         if (!em.GetEntity(Elements[index], out Element e)) 
+		//         	break;
+		//         if (CanMatch(e, origin)) {
+		//         	if (match.VerticalHits >= 4 && 
+		//         		Moved[index] 			&&
+		//         		lastFound == false) {
+		//         		lastFound = true;
+		//         		lineCellPos = new Vector2UInt(pos.x, y);
+		//         	}
+
+		//         	if (spawnBomb &&
+		//         		Moved[index]) {
+		//         		bombCellPos = new Vector2UInt(pos.x, y);
+		//         	}
+
+		//         	DestroyElement(index);
+		//         }
+		//         else break;
+		//     }
+		// }
+
+		// DestroyElement(originIndex);
+
+		// if (spawnBomb) {
+		// 	var (_, bomb) = em.CreateEntity<Bomb>("bomb",
+		// 										  GetCellCenter(bombCellPos),
+		// 										  0);
+		// 	bomb.SetColor(bombColor);
+		// 	PutElement(bombCellPos, bomb);
+		// } else if (spawnLine) {
+		// 	var (_, line) = em.CreateEntity<Line>("line", 
+		// 										  GetCellCenter(lineCellPos), 
+		// 										  0);
+
+		// 	line.SetColor(lineColor);
+		// 	PutElement(lineCellPos, line);
+		// }
+
 		if (!em.GetEntity(Elements[GetCellIndex(pos)], out Element origin)) 
 			return;
 
-		bool spawnLine   = false;
-		bool lastFound   = false;
-		var  lineColor   = origin.Color;
-		var  lineShape   = origin.Shape;
-		var  lineCellPos = Vector2UInt.zero;
-		var  originIndex = GetCellIndex(pos);
+		var originIndex = GetCellIndex(pos);
+		var spawnBomb   = match.CanSpawnBomb(this, pos);
+		var spawnLine   = !spawnBomb && match.CanSpawnLine();
 
-
-		if (match.HorizontalHits >= 4 || match.VerticalHits >= 4) {
-			spawnLine = true;
-			if (Moved[originIndex]) {
-				lastFound   = true;
-				lineCellPos = pos;
-			}
-		}
+		var lineCellPos = pos;
+		var bombCellPos = pos;
+		var lastFound   = spawnLine && Moved[originIndex];
 
 		if (match.HorizontalHits >= 3) {
-			for (var x = pos.x + 1; x < Size.x; x++) {
-				var index = GetCellIndex(x, pos.y);
-		        if (!em.GetEntity(Elements[index], out Element e)) 
-		        	break;
-		        if (e.Shape == origin.Shape && e.Color == origin.Color) {
-		        	if (match.HorizontalHits >= 4 && 
-		        		Moved[index] 			  &&
-		        		lastFound == false) {
-		        		lastFound = true;
-		        		lineCellPos = new Vector2UInt(x, pos.y);
-		        	}
-		        	DestroyElement(index);
-		        }
-		        else break;
-		    }
-
-		    for (var x = (int)pos.x - 1; x >= 0; x--) {
-		    	var index = GetCellIndex((uint)x, pos.y);
-		        if (!em.GetEntity(Elements[index], out Element e)) 
-		        	break;
-		        if (e.Shape == origin.Shape && e.Color == origin.Color) {
-		        	if (match.HorizontalHits >= 4 && 
-		        		Moved[index] 			  &&
-		        		lastFound == false) {
-		        		lastFound = true;
-		        		lineCellPos = new Vector2UInt(x, pos.y);
-		        	}
-		        	DestroyElement(index);
-		        }
-		        else break;
-		    }
+			DestroyInDirection(pos, origin, match.HorizontalHits,  1,  0, ref lastFound, ref lineCellPos, ref bombCellPos, spawnBomb, spawnLine);
+			DestroyInDirection(pos, origin, match.HorizontalHits, -1,  0, ref lastFound, ref lineCellPos, ref bombCellPos, spawnBomb, spawnLine);
 		}
 
 		if (match.VerticalHits >= 3) {
-			for (var y = pos.y + 1; y < Size.y; y++) {
-				var index = GetCellIndex(pos.x, y);
-		        if (!em.GetEntity(Elements[index], out Element e)) 
-		        	break;
-		        if (e.Shape == origin.Shape && e.Color == origin.Color) {
-		        	if (match.VerticalHits >= 4 && 
-		        		Moved[index] 			&&
-		        		lastFound == false) {
-		        		lastFound = true;
-		        		lineCellPos = new Vector2UInt(pos.x, y);
-		        	}
-		        	DestroyElement(index);
-		        }
-		        else break;
-		    }
-
-		    for (var y = (int)pos.y - 1; y >= 0; y--) {
-		    	var index = GetCellIndex(pos.x, (uint)y);
-		        if (!em.GetEntity(Elements[index], out Element e)) 
-		        	break;
-		        if (e.Shape == origin.Shape && e.Color == origin.Color) {
-		        	if (match.VerticalHits >= 4 && 
-		        		Moved[index] 			&&
-		        		lastFound == false) {
-		        		lastFound = true;
-		        		lineCellPos = new Vector2UInt(pos.x, y);
-		        	}
-		        	DestroyElement(index);
-		        }
-		        else break;
-		    }
+			DestroyInDirection(pos, origin, match.VerticalHits,    0,  1, ref lastFound, ref lineCellPos, ref bombCellPos, spawnBomb, spawnLine);
+			DestroyInDirection(pos, origin, match.VerticalHits,    0, -1, ref lastFound, ref lineCellPos, ref bombCellPos, spawnBomb, spawnLine);
 		}
 
 		DestroyElement(originIndex);
 
-		if (spawnLine) {
-			var (_, line) = em.CreateEntity<Line>("line", 
-												  GetCellCenter(lineCellPos), 
-												  0);
+		if (spawnBomb) {
+			var (_, bomb) = em.CreateEntity<Bomb>("bomb", GetCellCenter(bombCellPos), 0);
+			bomb.SetColor(origin.Color);
+			PutElement(bombCellPos, bomb);
+		} else if (spawnLine) {
+			var (_, line) = em.CreateEntity<Line>("line", GetCellCenter(lineCellPos), 0);
+			line.SetColor(origin.Color);
+			PutElement(lineCellPos, line);
+		}
+	}
 
-			line.SetShape(lineShape);
-			line.SetColor(lineColor);
+	private void DestroyInDirection(Vector2UInt pos, 
+									Element origin, 
+									uint hits,
+									int dx, 
+									int dy,
+									ref bool        lastFound,
+									ref Vector2UInt lineCellPos,
+									ref Vector2UInt bombCellPos,
+									bool spawnBomb, 
+									bool spawnLine) {
+		int  x = (int)pos.x + dx;
+		int  y = (int)pos.y + dy;
+
+		while (x >= 0 && 
+			   y >= 0 && 
+			   x < Size.x && 
+			   y < Size.y) {
+			var index = GetCellIndex((uint)x, (uint)y);
+			if (!em.GetEntity(Elements[index], out Element e)) break;
+
+			if (!CanMatch(e, origin)) {
+				if (!MatchColor(origin, e)) break;
+
+				int nx = x + dx; 
+				int ny = y + dy;
+				if (nx < 0 || ny < 0 || nx >= Size.x || ny >= Size.y) break;
+				if (!em.GetEntity(Elements[GetCellIndex((uint)nx, (uint)ny)], out Element next)) break;
+				if (!IsBonus(next.Type) || !MatchColor(origin, next)) break;
+			}
+
+			if (hits >= 4 && Moved[index] && !lastFound) {
+				lastFound   = true;
+				lineCellPos = new Vector2UInt(x, y);
+			}
+
+			if (spawnBomb && Moved[index]) {
+				bombCellPos = new Vector2UInt(x, y);
+			}
+
+			DestroyElement(index);
+			x += dx;
+			y += dy;
 		}
 	}
 
 	public MatchResult TryMatchAtPosition(Vector2UInt pos) {
+	    // if (!em.GetEntity(Elements[GetCellIndex(pos)], out Element origin)) 
+	    // 	return MatchResult.Zero;
+
+	    // uint horizontalHits = 1;
+	    // uint verticalHits   = 1;
+
+	    // for (var x = pos.x + 1; x < Size.x; x++) {
+	    // 	var index = GetCellIndex(x, pos.y);
+	    //     if (!em.GetEntity(Elements[index], out Element e)) 
+	    //     	break;
+	    //     if (CanMatch(origin, e))
+	    //     	horizontalHits++;
+	    //     else if (MatchColor(origin, e)) {
+	    //     	var nextx = x + 1;
+	    //     	if (nextx >= Size.x) break;
+	    //     	if (!em.GetEntity(Elements[GetCellIndex(new Vector2UInt(nextx, pos.y))], out Element next)) break;
+	    //     	if (!IsBonus(next.Type)) break;
+	    //     	if (!MatchColor(origin, next)) break;
+
+	    //     	horizontalHits++;
+	    //     }
+	    //     else break;
+	    // }
+
+	    // for (var x = (int)pos.x - 1; x >= 0; x--) {
+	    // 	var index = GetCellIndex((uint)x, pos.y);
+	    //     if (!em.GetEntity(Elements[index], out Element e)) 
+	    //     	break;
+	    //     if (CanMatch(origin, e))
+	    //     	horizontalHits++;
+	    //     else if (MatchColor(origin, e)) {
+	    //     	var nextx = x - 1;
+	    //     	if (nextx >= Size.x) break;
+	    //     	if (!em.GetEntity(Elements[GetCellIndex(new Vector2UInt(nextx, pos.y))], out Element next)) break;
+	    //     	if (!IsBonus(next.Type)) break;
+	    //     	if (!MatchColor(origin, next)) break;
+
+	    //     	horizontalHits++;
+	    //     }
+	    //     else break;
+	    // }
+
+	    // for (var y = pos.y + 1; y < Size.y; y++) {
+	    // 	var index = GetCellIndex(pos.x, y);
+	    //     if (!em.GetEntity(Elements[index], out Element e)) 
+	    //     	break;
+	    //     if (CanMatch(origin, e))
+	    //     	verticalHits++;
+	    //     else if (MatchColor(origin, e)) {
+	    //     	var nexty = y + 1;
+	    //     	if (nexty >= Size.x) break;
+	    //     	if (!em.GetEntity(Elements[GetCellIndex(new Vector2UInt(pos.x, nexty))], out Element next)) break;
+	    //     	if (!IsBonus(next.Type)) break;
+	    //     	if (!MatchColor(origin, next)) break;
+
+	    //     	verticalHits++;
+	    //     }
+	    //     else break;
+	    // }
+
+	    // for (var y = (int)pos.y - 1; y >= 0; y--) {
+	    // 	var index = GetCellIndex(pos.x, (uint)y);
+	    //     if (!em.GetEntity(Elements[index], out Element e)) 
+	    //     	break;
+	    //     if (CanMatch(origin, e))
+	    //     	verticalHits++;
+	    //     else if (MatchColor(origin, e)) {
+	    //     	var nexty = y - 1;
+	    //     	if (nexty >= Size.x) break;
+	    //     	if (!em.GetEntity(Elements[GetCellIndex(new Vector2UInt(pos.x, nexty))], out Element next)) break;
+	    //     	if (!IsBonus(next.Type)) break;
+	    //     	if (!MatchColor(origin, next)) break;
+
+	    //     	verticalHits++;
+	    //     }
+	    //     else break;
+	    // }
+
+	    // return new MatchResult(horizontalHits, verticalHits);
+
 	    if (!em.GetEntity(Elements[GetCellIndex(pos)], out Element origin)) 
 	    	return MatchResult.Zero;
 
-	    uint horizontalHits = 1;
-	    uint verticalHits   = 1;
-
-	    for (var x = pos.x + 1; x < Size.x; x++) {
-	        if (!em.GetEntity(Elements[GetCellIndex(x, pos.y)], out Element e)) 
-	        	break;
-	        if (e.Shape == origin.Shape && e.Color == origin.Color) 
-	        	horizontalHits++;
-	        else break;
-	    }
-
-	    for (var x = (int)pos.x - 1; x >= 0; x--) {
-	        if (!em.GetEntity(Elements[GetCellIndex((uint)x, pos.y)], out Element e)) 
-	        	break;
-	        if (e.Shape == origin.Shape && e.Color == origin.Color) 
-	        	horizontalHits++;
-	        else break;
-	    }
-
-	    for (var y = pos.y + 1; y < Size.y; y++) {
-	        if (!em.GetEntity(Elements[GetCellIndex(pos.x, y)], out Element e)) 
-	        	break;
-	        if (e.Shape == origin.Shape && e.Color == origin.Color) 
-	        	verticalHits++;
-	        else break;
-	    }
-
-	    for (var y = (int)pos.y - 1; y >= 0; y--) {
-	        if (!em.GetEntity(Elements[GetCellIndex(pos.x, (uint)y)], out Element e)) 
-	        	break;
-	        if (e.Shape == origin.Shape && e.Color == origin.Color) 
-	        	verticalHits++;
-	        else break;
-	    }
+	    uint horizontalHits = 1 + CountHits(pos, origin,  1,  0)
+	                            + CountHits(pos, origin, -1,  0);
+	    uint verticalHits   = 1 + CountHits(pos, origin,  0,  1)
+	                            + CountHits(pos, origin,  0, -1);
 
 	    return new MatchResult(horizontalHits, verticalHits);
+	}
+
+	public uint CountHits(Vector2UInt pos, Element origin, int dx, int dy) {
+		uint hits = 0;
+		int  x    = (int)pos.x + dx;
+		int  y    = (int)pos.y + dy;
+
+		while (x >= 0 && 
+			   y >= 0 && 
+			   x < Size.x && 
+			   y < Size.y) {
+			var index = GetCellIndex((uint)x, (uint)y);
+			if (!em.GetEntity(Elements[index], out Element e)) break;
+
+			if (CanMatch(origin, e)) {
+				hits++;
+			} else if (MatchColor(origin, e)) {
+				int nx = x + dx;
+				int ny = y + dy;
+				if (nx < 0 || 
+					ny < 0 || 
+					nx >= Size.x || 
+					ny >= Size.y) break;
+
+				if (!em.GetEntity(Elements[GetCellIndex((uint)nx, (uint)ny)], out Element next)) 
+					break;
+
+				if (!IsBonus(next.Type) || !MatchColor(origin, next)) 
+					break;
+
+				hits++;
+			} else {
+				break;
+			}
+
+			x += dx;
+			y += dy;
+		}
+
+		return hits;
 	}
 
 	public void RemoveElement(uint index) {
@@ -578,7 +772,72 @@ public class GridSystem : GameSystem {
 	    return null;
 	}
 
+	public void ExplodeBomb(Vector2UInt pos, int radius) {
+		int ymin = Mathf.Clamp((int)pos.y - radius, 0, (int)Size.y - 1);
+		int ymax = Mathf.Clamp((int)pos.y + radius, 0, (int)Size.y - 1);
+		int xmin = Mathf.Clamp((int)pos.x - radius, 0, (int)Size.x - 1);
+		int xmax = Mathf.Clamp((int)pos.x + radius, 0, (int)Size.x - 1);
+
+		for (var y = ymin; y <= ymax; y++) {
+			for (var x = xmin; x <= xmax; x++) {
+				var p = new Vector2UInt(x, y);
+
+				DestroyElement(GetCellIndex(p));
+			}
+		}
+	}
+
+	public void CreateDestroyerPair(Vector2UInt pos, LineDirection dir) {
+		if (dir == LineDirection.Horizontal) {
+			if (pos.x > 0) {
+				CreateDestroyer(pos, new Vector2Int(-1, 0));
+			}
+			if (pos.x < Size.x - 1) {
+				CreateDestroyer(pos, new Vector2Int(1, 0));
+			}
+		} else {
+			if (pos.y > 0) {
+				CreateDestroyer(pos, new Vector2Int(0, -1));
+			}
+			if (pos.y < Size.y - 1) {
+				CreateDestroyer(pos, new Vector2Int(0, 1));
+			}
+		}
+	}
+
+	private void CreateDestroyer(Vector2UInt pos, Vector2Int dir) {
+		var (handle, destroyer) = em.CreateEntity<Destroyer>("destroyer",
+															 GetCellCenter(pos),
+															 0f);
+
+
+		var trans = new DestroyerTransaction(this,
+											 handle,
+											 pos,
+											 dir,
+											 destroyerDuration);
+		var anim = Game.GetSystem<GridAnimationSystem>();
+
+		anim.AppendTransaction(trans);
+	}
+
 	private bool IsBonus(EntityType type) {
-		return type == EntityType.Line;
+		return type == EntityType.Line ||
+			   type == EntityType.Bomb;
+	}
+
+	private bool CanMatch(Element a, Element b) {
+		if (!MatchColor(a, b)) return false;
+
+		if (IsBonus(a.Type) ||
+			IsBonus(b.Type)) {
+			return true;
+		}
+
+		return a.Shape == b.Shape && a.Color == b.Color;
+	}
+
+	private bool MatchColor(Element a, Element b) {
+		return a.Color == b.Color;
 	}
 }

@@ -52,12 +52,10 @@ public class FailedSwitchTransaction : Transaction {
 			return;
 		}
 
-		var firstPos  = first.Position;
-		var secondPos = second.Position;
 		var t         = timePassed / Duration;
 
-		firstPos  = Mathf.PingPong(FirstStart, FirstTarget, t);
-		secondPos = Mathf.PingPong(SecondStart, SecondTarget, t);
+		var firstPos  = Mathf.PingPong(FirstStart, FirstTarget, t);
+		var secondPos = Mathf.PingPong(SecondStart, SecondTarget, t);
 
 		first.Position  = firstPos;
 		second.Position = secondPos;
