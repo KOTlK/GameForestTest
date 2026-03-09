@@ -1,0 +1,202 @@
+Entity(green_circle_element) :
+    Type     : EntityType(Element)
+    Flags    : EntityFlags(Dynamic)
+    Scale    : Vector2(1.0f, 1.0f)
+    Color    : ElementColor(Green)
+    Shape    : ElementShape(Circle)
+    Score    : uint(1)
+    Renderer : Renderer2D (
+        Color       : Color(Green)
+        Shape       : ShapeType(Sprite)
+        Size        : Vector2(20.0f, 20.0f)
+        TexturePath : "assets/textures/circle.png"
+    )
+
+Entity(red_circle_element) :
+    Type     : EntityType(Element)
+    Flags    : EntityFlags(Dynamic)
+    Scale    : Vector2(1.0f, 1.0f)
+    Color    : ElementColor(Red)
+    Shape    : ElementShape(Circle)
+    Score    : uint(1)
+    Renderer : Renderer2D (
+        Color       : Color(Red)
+        Shape       : ShapeType(Sprite)
+        Size        : Vector2(20.0f, 20.0f)
+        TexturePath : "assets/textures/circle.png"
+    )
+    
+Entity(blue_circle_element) :
+    Type     : EntityType(Element)
+    Flags    : EntityFlags(Dynamic)
+    Scale    : Vector2(1.0f, 1.0f)
+    Color    : ElementColor(Blue)
+    Shape    : ElementShape(Circle)
+    Score    : uint(1)
+    Renderer : Renderer2D (
+        Color       : Color(Blue)
+        Shape       : ShapeType(Sprite)
+        Size        : Vector2(20.0f, 20.0f)
+        TexturePath : "assets/textures/circle.png"
+    )
+
+Entity(green_rectangle_element) :
+    Type     : EntityType(Element)
+    Flags    : EntityFlags(Dynamic)
+    Scale    : Vector2(1.0f, 1.0f)
+    Color    : ElementColor(Green)
+    Shape    : ElementShape(Rectangle)
+    Score    : uint(1)
+    Renderer : Renderer2D (
+        Color       : Color(Green)
+        Shape       : ShapeType(Sprite)
+        Size        : Vector2(20.0f, 20.0f)
+        TexturePath : "assets/textures/rect.png"
+    )
+
+Entity(red_rectangle_element) :
+    Type     : EntityType(Element)
+    Flags    : EntityFlags(Dynamic)
+    Scale    : Vector2(1.0f, 1.0f)
+    Color    : ElementColor(Green)
+    Shape    : ElementShape(Rectangle)
+    Score    : uint(1)
+    Renderer : Renderer2D (
+        Color       : Color(Red)
+        Shape       : ShapeType(Sprite)
+        Size        : Vector2(20.0f, 20.0f)
+        TexturePath : "assets/textures/rect.png"
+    )
+
+Entity(blue_rectangle_element) :
+    Type     : EntityType(Element)
+    Flags    : EntityFlags(Dynamic)
+    Scale    : Vector2(1.0f, 1.0f)
+    Color    : ElementColor(Green)
+    Shape    : ElementShape(Rectangle)
+    Score    : uint(1)
+    Renderer : Renderer2D (
+        Color       : Color(Blue)
+        Shape       : ShapeType(Sprite)
+        Size        : Vector2(20.0f, 20.0f)
+        TexturePath : "assets/textures/rect.png"
+    )
+
+Entity(score_ui) :
+    Type     : EntityType(UI)
+    Flags    : EntityFlags(Dynamic)
+    Scale    : Vector2(1.0f, 1.0f)
+    Renderer : Renderer2D (
+        Shape    : ShapeType(Text)
+        Color    : Color(Black)
+        Size     : Vector2(20.0f, 20.0f)
+        FontSize : int(3)
+        Offset   : Vector2(0.0f, 0.0f)
+    )
+
+Entity(line) :
+    Type     : EntityType(Line)
+    Flags    : EntityFlags(Dynamic)
+    Scale    : Vector2(1.0f, 1.0f)
+    Color    : ElementColor(None)
+    Shape    : ElementShape(None)
+    Score    : uint(1)
+    Renderer : Renderer2D (
+        Color       : Color(Yellow)
+        Shape       : ShapeType(Sprite)
+        Size        : Vector2(20.0f, 20.0f)
+        TexturePath : "assets/textures/line.png"
+    )
+
+Texture("assets/textures/circle.png")
+Texture("assets/textures/rect.png")
+Texture("assets/textures/line.png")
+
+Entity(destroyer) :
+    Type     : EntityType(Destroyer)
+    Flags    : EntityFlags(Dynamic)
+    Scale    : Vector2(1.0f, 1.0f)
+    Color    : ElementColor(None)
+    Shape    : ElementShape(None)
+    Score    : uint(0)
+    Renderer : Renderer2D (
+        Shape       : ShapeType(Sprite)
+        Color       : Color(Magenta)
+        Size        : Vector2(20.0f, 20.0f)
+        TexturePath : "assets/textures/destroyer.png"
+    )
+
+Texture("assets/textures/destroyer.png")
+
+Entity(bomb) :
+    Type     : EntityType(Bomb)
+    Flags    : EntityFlags(None)
+    Scale    : Vector2(1.0f, 1.0f)
+    Color    : ElementColor(None)
+    Shape    : ElementShape(None)
+    Score    : uint(1)
+    Radius   : int(1)
+    Timeout  : float(0.25f)
+    Renderer : Renderer2D (
+        Shape       : ShapeType(Sprite)
+        Color       : Color(Yellow)
+        Size        : Vector2(20.0f, 20.0f)
+        TexturePath : "assets/textures/bomb.png"
+    )
+
+Texture("assets/textures/bomb.png")
+
+Entity(play_button) :
+    Type       : EntityType(UI)
+    Flags      : EntityFlags(None)
+    Scale      : Vector2(1.0f, 1.0f)
+    TextColor  : Color(Red)
+    TextOffset : Vector2(-9.5f, -5.0f)
+    FontSize   : int(3)
+    Size       : Vector2(30.0f, 20.0f)
+    Text       : "Play"
+    Renderer : Renderer2D (
+        Shape       : ShapeType(Sprite)
+        Color       : Color(SkyBlue)
+        Size        : Vector2(30.0f, 20.0f)
+        TexturePath : "assets/textures/rect.png"
+    )
+
+Entity(exit_button) :
+    Type       : EntityType(UI)
+    Flags      : EntityFlags(None)
+    Scale      : Vector2(1.0f, 1.0f)
+    TextColor  : Color(Red)
+    TextOffset : Vector2(-5.0f, -5.0f)
+    FontSize   : int(3)
+    Size       : Vector2(30.0f, 20.0f)
+    Text       : "OK"
+    Renderer : Renderer2D (
+        Shape       : ShapeType(Sprite)
+        Color       : Color(SkyBlue)
+        Size        : Vector2(30.0f, 20.0f)
+        TexturePath : "assets/textures/rect.png"
+    )
+
+Entity(time_ui) :
+    Type     : EntityType(UI)
+    Flags    : EntityFlags(None)
+    Scale    : Vector2(1.0f, 1.0f)
+    Renderer : Renderer2D (
+        Shape    : ShapeType(Text)
+        Color    : Color(Black)
+        Offset   : Vector2(0.0f, 0.0f)
+        FontSize : int(3)
+    )
+
+Entity(text) :
+    Type     : EntityType(UI)
+    Flags    : EntityFlags(None)
+    Scale    : Vector2(1.0f, 1.0f)
+    Renderer : Renderer2D (
+        Shape    : ShapeType(Text)
+        Color    : Color(Black)
+        Offset   : Vector2(0.0f, 0.0f)
+        Text     : "Hello World!"
+        FontSize : int(3)
+    )

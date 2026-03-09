@@ -1,5 +1,11 @@
+namespace AssetManagement;
+
 public static class AssetManager {
 	private static AssetDatabase database = new();
+
+	public static void LoadDatabase() {
+		database.LoadFromFile("assets/assets.data");
+	}
 
 	public static void LoadEntity(string name, Entity entity) {
 		database.ReadEntity(name, entity);

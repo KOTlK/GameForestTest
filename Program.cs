@@ -1,6 +1,7 @@
 ﻿using Raylib_cs;
 using System.Numerics;
 using System;
+using AssetManagement;
 
 using static Raylib_cs.Raylib;
 
@@ -14,6 +15,7 @@ internal static class Program {
     [System.STAThread]
     public static void Main() {
         InitWindow(WindowWidth, WindowHeight, "Hello World");
+        AssetManager.LoadDatabase();
         Events.Init();
         
         var camera = new Camera(new Vector2(WindowWidth / 2f, WindowHeight / 2f),
