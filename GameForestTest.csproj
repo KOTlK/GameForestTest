@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="rmdir /S /Q &quot;$(TargetDir)assets&quot; 2&gt;nul&#xD;&#xA;xcopy &quot;$(ProjectDir)assets\*&quot; &quot;$(TargetDir)\assets&quot; /Y /I /E /Q /D&#xD;&#xA;&#xD;&#xA;rmdir /S /Q &quot;$(TargetDir)redist&quot; 2&gt;nul&#xD;&#xA;xcopy &quot;$(ProjectDir)redist\*&quot; &quot;$(TargetDir)\redist&quot; /Y /I /E /Q /D" />
+    <Exec Command="rmdir /S /Q &quot;$(TargetDir)assets&quot; 2&gt;nul&#xD;&#xA;xcopy &quot;$(ProjectDir)assets\*&quot; &quot;$(TargetDir)\assets&quot; /Y /I /E /Q /D" />
   </Target>
 
 </Project>
