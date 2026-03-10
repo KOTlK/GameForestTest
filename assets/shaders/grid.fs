@@ -22,10 +22,13 @@ int getCellIndex(vec2 uv) {
 void main() {
     int cellIndex = getCellIndex(fragTexCoord);
 
-    vec2 f = abs(fract(fragTexCoord * (gridSize + borderWidth)));
+    vec2 f = abs(fract(fragTexCoord * (gridSize)));
 
     bool isSelected = cellIndex == selectedCell;
-    bool isBorder = f.x <= borderWidth.x || f.y <= borderWidth.y;
+    bool isBorder = f.x <= borderWidth.x || 
+                    f.x >= 1.0 - borderWidth.x ||
+                    f.y <= borderWidth.y ||
+                    f.y >= 1.0 - borderWidth.y;
 
     if (isSelected) {
         finalColor = isBorder ? selectedCellBorderColor : selectedCellColor;

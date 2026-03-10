@@ -34,9 +34,9 @@ public class RenderSystem : GameSystem {
     private int       selectedCellBorderColorLoc;
 
     private Color     selectedCellColor       = Color.Brown;
-    private Color     selectedCellBorderColor = Color.Red;
+    private Color     selectedCellBorderColor = Color.SkyBlue;
     private Color     gridColor               = Color.Beige;
-    private Color     gridBorderColor         = Color.Magenta;
+    private Color     gridBorderColor         = Color.DarkGray;
 
     private const uint InitialRenderersCount = 128;
 
@@ -133,7 +133,6 @@ public class RenderSystem : GameSystem {
         BeginMode2D(camera.RaylibCamera);
 
         if (grid.Enabled) {
-            // @Cleanup: For now it's just lines, switch to shader later.
             var gridSize = grid.Size;
             var cellSize = grid.CellSize;
 
