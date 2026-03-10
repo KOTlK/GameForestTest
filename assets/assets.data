@@ -200,3 +200,5 @@ Entity(text) :
         Text     : "Hello World!"
         FontSize : int(3)
     )
+
+Texture("assets/textures/grid.png")

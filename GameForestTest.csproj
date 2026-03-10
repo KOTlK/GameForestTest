@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
@@ -21,7 +21,7 @@
     <PackageReference Include="Raylib-cs" Version="7.0.2" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="rmdir /S /Q &quot;$(TargetDir)assets&quot; 2&gt;nul&#xD;&#xA;xcopy &quot;$(ProjectDir)assets\*&quot; &quot;$(TargetDir)\assets&quot; /Y /I /E /Q /D&#xD;&#xA;&#xD;&#xA;rmdir /S /Q &quot;$(TargetDir)redist&quot; 2&gt;nul&#xD;&#xA;xcopy &quot;$(ProjectDir)redist\*&quot; &quot;$(TargetDir)\redist&quot; /Y /I /E /Q /D" />
   </Target>
 

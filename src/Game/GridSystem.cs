@@ -535,39 +535,39 @@ public class GridSystem : GameSystem {
 	           (rowDiff == 0 && colDiff == 1);
 	}
 
-	private Element GetLastMovedInHorizontalLine(Vector2UInt pos) {
-		var originIndex = GetCellIndex(pos);
-		if (!em.GetEntity(Elements[GetCellIndex(pos)], out Element origin))
-			return null;
+	// private Element GetLastMovedInHorizontalLine(Vector2UInt pos) {
+	// 	var originIndex = GetCellIndex(pos);
+	// 	if (!em.GetEntity(Elements[GetCellIndex(pos)], out Element origin))
+	// 		return null;
 
-		if (Moved[originIndex]) return origin;
+	// 	if (Moved[originIndex]) return origin;
 
-		for (var x = pos.x + 1; x < Size.x; x++) {
-			var index = GetCellIndex(x, pos.y);
-	        if (!em.GetEntity(Elements[index], out Element e)) 
-	        	break;
-	        if (e.Shape == origin.Shape && e.Color == origin.Color) {
-	        	if (Moved[index]) {
-	        		return e;
-	        	}
-	        }
-	        else break;
-	    }
+	// 	for (var x = pos.x + 1; x < Size.x; x++) {
+	// 		var index = GetCellIndex(x, pos.y);
+	//         if (!em.GetEntity(Elements[index], out Element e)) 
+	//         	break;
+	//         if (e.Shape == origin.Shape && e.Color == origin.Color) {
+	//         	if (Moved[index]) {
+	//         		return e;
+	//         	}
+	//         }
+	//         else break;
+	//     }
 
-	    for (var x = (int)pos.x - 1; x >= 0; x--) {
-	    	var index = GetCellIndex((uint)x, pos.y);
-	        if (!em.GetEntity(Elements[index], out Element e)) 
-	        	break;
-	        if (e.Shape == origin.Shape && e.Color == origin.Color) {
-	        	if (Moved[index]) {
-	        		return e;
-	        	}
-	        }
-	        else break;
-	    }
+	//     for (var x = (int)pos.x - 1; x >= 0; x--) {
+	//     	var index = GetCellIndex((uint)x, pos.y);
+	//         if (!em.GetEntity(Elements[index], out Element e)) 
+	//         	break;
+	//         if (e.Shape == origin.Shape && e.Color == origin.Color) {
+	//         	if (Moved[index]) {
+	//         		return e;
+	//         	}
+	//         }
+	//         else break;
+	//     }
 
-	    return null;
-	}
+	//     return null;
+	// }
 
 	public void ExplodeBomb(Vector2UInt pos, int radius) {
 		int ymin = Mathf.Clamp((int)pos.y - radius, 0, (int)Size.y - 1);

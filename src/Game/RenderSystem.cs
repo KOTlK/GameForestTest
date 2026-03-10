@@ -7,181 +7,263 @@ using static Raylib_cs.Raylib;
 using static Assertions;
 
 public struct RendererHandle {
-	public uint Id;
+    public uint Id;
 
-	public static readonly RendererHandle Zero = new RendererHandle() {Id = 0};
+    public static readonly RendererHandle Zero = new RendererHandle() {Id = 0};
 }
 
 public class RenderSystem : GameSystem {
-	public Renderer[] Renderers 	    = new Renderer[InitialRenderersCount];
-	public bool[]     RendererFree      = new bool[InitialRenderersCount];
-	public uint[]     NextFreeRenderer  = new uint[InitialRenderersCount];
-	public uint       RenderersLength   = InitialRenderersCount;
-	public uint       RenderersCount    = 1;
-	public uint       FirstFreeRenderer = 0;
+    public Renderer[] Renderers         = new Renderer[InitialRenderersCount];
+    public bool[]     RendererFree      = new bool[InitialRenderersCount];
+    public uint[]     NextFreeRenderer  = new uint[InitialRenderersCount];
+    public uint       RenderersLength   = InitialRenderersCount;
+    public uint       RenderersCount    = 1;
+    public uint       FirstFreeRenderer = 0;
 
-	private EntityManager em;
-	private Camera        camera;
-	private GridSystem    grid;
+    private EntityManager em;
+    private Camera        camera;
+    private GridSystem    grid;
 
-	private const uint InitialRenderersCount = 128;
+    private Texture2D gridTexture;
+    private Shader    gridShader;
+    private int       gridSizeLoc;
+    private int       gridCellSizeLoc;
+    private int       borderColorLoc;
+    private int       selectedCellLoc;
+    private int       selectedCellColorLoc;
+    private int       selectedCellBorderColorLoc;
 
-	public RenderSystem(Game game, EntityManager entityManager, Camera cam) : base(game, true) {
-		em = entityManager;
-		camera = cam;
-		grid = game.GetSystem<GridSystem>();
+    private Color     selectedCellColor       = Color.Brown;
+    private Color     selectedCellBorderColor = Color.Red;
+    private Color     gridColor               = Color.Beige;
+    private Color     gridBorderColor         = Color.Magenta;
 
-		for (var i = 0; i < InitialRenderersCount; i++) {
-			RendererFree[i] = true;
-		}
+    private const uint InitialRenderersCount = 128;
 
-	}
+    public RenderSystem(Game game, EntityManager entityManager, Camera cam) : 
+        base(game, true) {
+        em = entityManager;
+        camera = cam;
+        grid = game.GetSystem<GridSystem>();
 
-	public RendererHandle AppendRenderer(Renderer renderer) {
-		var id = GetNextRendererId();
-		RendererFree[id] = false;
-		Renderers[id] = renderer;
+        for (var i = 0; i < InitialRenderersCount; i++) {
+            RendererFree[i] = true;
+        }
 
-		return new RendererHandle() {
-			Id = id
-		};
-	}
+        gridShader = LoadShader(null, "assets/shaders/grid.fs");
 
-	public void RemoveRenderer(RendererHandle handle) {
-		if (handle.Id == 0) return;
-		RendererFree[handle.Id] = true;
-		NextFreeRenderer[handle.Id] = FirstFreeRenderer;
-		FirstFreeRenderer = handle.Id;
-	}
+        gridSizeLoc                = GetShaderLocation(gridShader, 
+                                                       "gridSize");
+        gridCellSizeLoc            = GetShaderLocation(gridShader, 
+                                                       "cellSize");
+        selectedCellLoc            = GetShaderLocation(gridShader, 
+                                                        "selectedCell");
+        selectedCellColorLoc       = GetShaderLocation(gridShader, 
+                                                        "selectedCellColor");
+        borderColorLoc             = GetShaderLocation(gridShader, 
+                                                        "borderColor");
+        selectedCellBorderColorLoc = GetShaderLocation(gridShader, 
+                                                        "selectedCellBorderColor");
 
-	public ref Renderer GetRenderer(RendererHandle handle) {
-		// renderer at index 0 will never be rendered
-		if (RendererFree[handle.Id]) {
-			
-			return ref Renderers[0];
-		}
+        gridTexture = AssetManagement.AssetManager.LoadAsset<Texture2D>(
+                                            "assets/textures/grid.png");
 
-		return ref Renderers[handle.Id];
-	}
+        SetShaderValue<Vector2>(gridShader, 
+                                gridSizeLoc, 
+                                grid.Size, 
+                                ShaderUniformDataType.Vec2);
 
-	public override void Update() {
-		BeginDrawing();
-		ClearBackground(Color.White);
+        SetShaderValue<Vector2>(gridShader, 
+                                gridCellSizeLoc, 
+                                grid.CellSize, 
+                                ShaderUniformDataType.Vec2);
 
-		BeginMode2D(camera.RaylibCamera);
+        SetShaderValue<Vector4>(gridShader, 
+                                selectedCellColorLoc, 
+                                ColorNormalize(selectedCellColor),
+                                ShaderUniformDataType.Vec4);
 
-		if (grid.Enabled) {
-			// @Cleanup: For now it's just lines, switch to shader later.
-			var gridSize = grid.Size;
-			var cellSize = grid.CellSize;
+        SetShaderValue<Vector4>(gridShader,
+                                borderColorLoc,
+                                ColorNormalize(gridBorderColor),
+                                ShaderUniformDataType.Vec4);
 
-			var sx = (float)gridSize.x * cellSize.X;
-			var sy = (float)gridSize.y * cellSize.Y;
+        SetShaderValue<Vector4>(gridShader,
+                                selectedCellBorderColorLoc,
+                                ColorNormalize(selectedCellBorderColor),
+                                ShaderUniformDataType.Vec4);
+    }
 
-			for (uint y = 0; y < gridSize.y; y++) {
-				for (uint x = 0; x < gridSize.x; x++) {
-					var cellIndex = grid.GetCellIndex(x, y);
-					var color     = cellIndex == grid.SelectedCell ? Color.Green : 
-																	 Color.Beige;
-					var pos = new Vector2(x * cellSize.X,
-										  y * cellSize.Y);
-					var rect = new Rectangle(pos, cellSize);
+    public RendererHandle AppendRenderer(Renderer renderer) {
+        var id = GetNextRendererId();
+        RendererFree[id] = false;
+        Renderers[id] = renderer;
 
-					DrawRectangleLinesEx(rect, 1, color);
+        return new RendererHandle() {
+            Id = id
+        };
+    }
 
-#if true
-					if (grid.Moved[cellIndex]) {
-						DrawRectangle((int)pos.X, (int)pos.Y, (int)cellSize.X, (int)cellSize.Y, Color.Magenta);
-					}
-#endif 	
-				}
-			}
+    public void RemoveRenderer(RendererHandle handle) {
+        if (handle.Id == 0) return;
+        RendererFree[handle.Id] = true;
+        NextFreeRenderer[handle.Id] = FirstFreeRenderer;
+        FirstFreeRenderer = handle.Id;
+    }
 
-		}
+    public ref Renderer GetRenderer(RendererHandle handle) {
+        // renderer at index 0 will never be rendered
+        if (RendererFree[handle.Id]) {
+            
+            return ref Renderers[0];
+        }
 
-		// Render entities.
-		for (var i = 1; i < RenderersCount; i++) {
-			if (RendererFree[i]) continue;
+        return ref Renderers[handle.Id];
+    }
 
-			var renderer = Renderers[i];
+    public override void Update() {
+        BeginDrawing();
+        ClearBackground(Color.White);
 
-			if (renderer.Shape == ShapeType.Text) continue;
+        SetShaderValue<int>(gridShader, 
+                            selectedCellLoc, 
+                            grid.SelectedCell, 
+                            ShaderUniformDataType.Int);
 
-			if (!em.GetEntity(renderer.Entity, out Entity entity)) continue;
+        BeginMode2D(camera.RaylibCamera);
 
-			switch (renderer.Shape) {
-				// case ShapeType.Text : {
-				// 	var center   = entity.Position;
-				// 	center      += renderer.Offset;
-				// 	DrawText(renderer.Text, (int)center.X, (int)center.Y, renderer.FontSize, renderer.Color);
-				// } break;
-				case ShapeType.Sprite : {
-					var center   = entity.Position;
-					var size     = renderer.Size * entity.Scale;
-					var halfSize = size * 0.5f;
-					center 		+= renderer.Offset;
+        if (grid.Enabled) {
+            // @Cleanup: For now it's just lines, switch to shader later.
+            var gridSize = grid.Size;
+            var cellSize = grid.CellSize;
 
-					var rect = new Rectangle(center.X, 
-											 center.Y, 
-											 size.X, 
-											 size.Y);
-					var txt  = new Rectangle(0, 
-											 0, 
-											 renderer.Texture.Width,
-											 renderer.Texture.Height);
+            var sx = (float)gridSize.x * cellSize.X;
+            var sy = (float)gridSize.y * cellSize.Y;
 
-					DrawTexturePro(renderer.Texture, 
-								   txt, 
-								   rect, 
-								   halfSize, // pivot
-								   entity.Orientation, 
-								   renderer.Color);
-				} break;
-				default : break;
-			}
-		}
+            var r = new Rectangle(0, 
+                                  0, 
+                                  sx, 
+                                  sy);
+            var t  = new Rectangle(0, 
+                                   0, 
+                                   gridTexture.Width,
+                                   gridTexture.Height);
 
-		// @Cleanup: I don't want to make render queues, so i render text after all other entities to make buttons work correctly. :)
-		for (var i = 1; i < RenderersCount; i++) {
-			if (RendererFree[i]) continue;
+            BeginShaderMode(gridShader);
 
-			var renderer = Renderers[i];
+            DrawTexturePro(gridTexture, 
+                           t, 
+                           r, 
+                           Vector2.Zero, // pivot
+                           0, 
+                           gridColor);
 
-			if (!em.GetEntity(renderer.Entity, out Entity entity)) continue;
+            EndShaderMode();
 
-			if (renderer.Shape == ShapeType.Text) {
-				var center   = entity.Position;
-				center      += renderer.Offset;
-				DrawText(renderer.Text, (int)center.X, (int)center.Y, renderer.FontSize, renderer.Color);
-			}
-		}
+#if false // Debug draw moved cells.
+            for (uint y = 0; y < gridSize.y; y++) {
+                for (uint x = 0; x < gridSize.x; x++) {
+                    var cellIndex = grid.GetCellIndex(x, y);
+                    var pos = new Vector2(x * cellSize.X,
+                                          y * cellSize.Y);
+                    var rect = new Rectangle(pos, cellSize);
 
-		EndMode2D();
+                    if (grid.Moved[cellIndex]) {
+                        DrawRectangle((int)pos.X, 
+                                      (int)pos.Y, 
+                                      (int)cellSize.X, 
+                                      (int)cellSize.Y, 
+                                      Color.Magenta);
+                    }
+                }
+            }
+#endif  
+        }
 
-		EndDrawing();
-	}
+        // Render entities.
+        for (var i = 1; i < RenderersCount; i++) {
+            if (RendererFree[i]) continue;
 
-	private uint GetNextRendererId() {
-		uint id;
+            var renderer = Renderers[i];
 
-		if (FirstFreeRenderer > 0) {
-			id = FirstFreeRenderer;
-			FirstFreeRenderer = NextFreeRenderer[id];
-			return id;
-		}
+            if (renderer.Shape == ShapeType.Text) continue;
 
-		id = RenderersCount++;
+            if (!em.GetEntity(renderer.Entity, out Entity entity)) continue;
 
-		if (RenderersCount >= RenderersLength) {
-			Resize(RenderersCount + 128);
-		}
+            switch (renderer.Shape) {
+                case ShapeType.Sprite : {
+                    var center   = entity.Position;
+                    var size     = renderer.Size * entity.Scale;
+                    var halfSize = size * 0.5f;
+                    center      += renderer.Offset;
 
-		return id;
-	}
+                    var rect = new Rectangle(center.X, 
+                                             center.Y, 
+                                             size.X, 
+                                             size.Y);
+                    var txt  = new Rectangle(0, 
+                                             0, 
+                                             renderer.Texture.Width,
+                                             renderer.Texture.Height);
 
-	private void Resize(uint newSize) {
-		Array.Resize(ref Renderers, (int)newSize);
-		Array.Resize(ref RendererFree, (int)newSize);
-		Array.Resize(ref NextFreeRenderer, (int)newSize);
-	}
+                    DrawTexturePro(renderer.Texture, 
+                                   txt, 
+                                   rect, 
+                                   halfSize, // pivot
+                                   entity.Orientation, 
+                                   renderer.Color);
+                } break;
+                default : break;
+            }
+        }
+
+        // @Cleanup: I don't want to make render queues, 
+        // so i render text after all other entities 
+        // to make buttons work correctly. :)
+        for (var i = 1; i < RenderersCount; i++) {
+            if (RendererFree[i]) continue;
+
+            var renderer = Renderers[i];
+
+            if (!em.GetEntity(renderer.Entity, out Entity entity)) continue;
+
+            if (renderer.Shape == ShapeType.Text) {
+                var center   = entity.Position;
+                center      += renderer.Offset;
+                DrawText(renderer.Text, 
+                         (int)center.X, 
+                         (int)center.Y, 
+                         renderer.FontSize, 
+                         renderer.Color);
+            }
+        }
+
+        EndMode2D();
+
+        EndDrawing();
+    }
+
+    private uint GetNextRendererId() {
+        uint id;
+
+        if (FirstFreeRenderer > 0) {
+            id = FirstFreeRenderer;
+            FirstFreeRenderer = NextFreeRenderer[id];
+            return id;
+        }
+
+        id = RenderersCount++;
+
+        if (RenderersCount >= RenderersLength) {
+            Resize(RenderersCount + 128);
+        }
+
+        return id;
+    }
+
+    private void Resize(uint newSize) {
+        Array.Resize(ref Renderers, (int)newSize);
+        Array.Resize(ref RendererFree, (int)newSize);
+        Array.Resize(ref NextFreeRenderer, (int)newSize);
+    }
 }

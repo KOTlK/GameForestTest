@@ -38,7 +38,6 @@ public class EntityManager {
     public event Action<FlagsChange> EntityFlagsChanged = delegate {};
 
     public Dictionary<EntityType, IntrusiveList> EntitiesByType = new();
-    public List<Entity>  BakedEntities = new();
     public Entity[]      Entities = new Entity[InitialCapacity];
     public EntityType[]  Types = new EntityType[InitialCapacity];
     public EntityFlags[] Flags = new EntityFlags[InitialCapacity];
@@ -56,7 +55,6 @@ public class EntityManager {
     private const uint ResizeStep      = 1024;
 
     public EntityManager() {
-        BakedEntities.Clear();
         EntitiesByType.Clear();
         MaxEntitiesCount = 1;
         FirstFree = 0;

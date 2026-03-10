@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text;
 using System.Runtime.CompilerServices;
+using System;
 
 public static class Assertions {
     private static StringBuilder sb = new();
@@ -14,6 +15,7 @@ public static class Assertions {
            [CallerLineNumber] int           lineNumber   = 0) {
         if(!expr) {
             Console.WriteLine($"Assert failed at {filePath}:{lineNumber}. {errorMessage}");
+            Environment.Exit(1);
         }
     }
 
@@ -57,6 +59,7 @@ public static class Assertions {
             Console.WriteLine(sb.ToString());
 
             sb.Clear();
+            Environment.Exit(1);
         }
     }
 }
